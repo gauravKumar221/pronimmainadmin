@@ -14,8 +14,7 @@ import {
   HelpCircle,
   ShieldCheck,
   FileCheck,
-  LogOut,
-  MessageCircleQuestion
+  LogOut
 } from 'lucide-react';
 
 const navItems = [
@@ -26,7 +25,6 @@ const navItems = [
   { name: 'Agencies', href: '/dashboard/agency', icon: Building2 },
   { name: 'Owners', href: '/dashboard/owner', icon: Contact },
   { name: 'About Us', href: '/dashboard/about', icon: Info },
-  { name: 'About Us FAQ', href: '/dashboard/about-faq', icon: MessageCircleQuestion },
   { name: 'FAQs', href: '/dashboard/faqs', icon: HelpCircle },
   { name: 'Privacy Policy', href: '/dashboard/privacy', icon: ShieldCheck },
   { name: 'Terms & Conditions', href: '/dashboard/terms', icon: FileCheck },

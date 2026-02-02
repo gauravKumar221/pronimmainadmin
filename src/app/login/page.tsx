@@ -16,11 +16,10 @@ export default function LoginPage() {
     setIsLoading(true);
     setError('');
 
-    // In a real app, this would call a server action or API
-    // Using simple simulation for the proposal requirements
-    const ADMIN_USERNAME = 'admin';
-    const ADMIN_EMAIL = 'admin@example.com';
-    const ADMIN_PASSWORD = 'admin123';
+    // Updated credentials as requested
+    const ADMIN_USERNAME = 'gaurav kumar';
+    const ADMIN_EMAIL = 'gauravaj@gmail.com';
+    const ADMIN_PASSWORD = 'gaurav@221';
 
     if (
       (identifier === ADMIN_USERNAME || identifier === ADMIN_EMAIL) &&
@@ -58,7 +57,7 @@ export default function LoginPage() {
               id="identifier"
               type="text"
               className="adminix-input"
-              placeholder="admin / admin@example.com"
+              placeholder="gaurav kumar / gauravaj@gmail.com"
               value={identifier}
               onChange={(e) => setIdentifier(e.target.value)}
               required
@@ -90,7 +89,7 @@ export default function LoginPage() {
         </form>
 
         <div className="mt-8 text-center text-xs text-gray-400">
-          <p>Demo credentials: admin / admin123</p>
+          <p>Demo credentials: gaurav kumar / gaurav@221</p>
         </div>
       </div>
     </div>

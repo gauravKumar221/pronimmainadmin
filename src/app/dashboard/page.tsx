@@ -2,7 +2,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Users, Building2, FileText, Image as ImageIcon, Clock } from 'lucide-react';
+import { User, Building2, Contact, FileText, Clock } from 'lucide-react';
 
 export default function DashboardPage() {
   const [loginTime, setLoginTime] = useState<string | null>(null);
@@ -15,10 +15,10 @@ export default function DashboardPage() {
   }, []);
 
   const stats = [
-    { name: 'Total Users', value: '1,234', icon: Users, color: 'text-blue-600', bg: 'bg-blue-50' },
+    { name: 'Total Agents', value: '124', icon: User, color: 'text-blue-600', bg: 'bg-blue-50' },
     { name: 'Active Agencies', value: '42', icon: Building2, color: 'text-accent', bg: 'bg-green-50' },
-    { name: 'Blog Posts', value: '89', icon: FileText, color: 'text-purple-600', bg: 'bg-purple-50' },
-    { name: 'Active Banners', value: '2', icon: ImageIcon, color: 'text-orange-600', bg: 'bg-orange-50' },
+    { name: 'Total Owners', value: '89', icon: Contact, color: 'text-purple-600', bg: 'bg-purple-50' },
+    { name: 'Blog Posts', value: '12', icon: FileText, color: 'text-orange-600', bg: 'bg-orange-50' },
   ];
 
   return (
@@ -57,15 +57,27 @@ export default function DashboardPage() {
             <button className="text-accent text-sm font-medium">View All</button>
           </div>
           <div className="p-6 space-y-4">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="flex gap-4 items-start pb-4 border-b border-gray-50 last:border-0 last:pb-0">
-                <div className="w-2 h-2 rounded-full bg-accent mt-2 shrink-0"></div>
-                <div>
-                  <p className="text-sm text-gray-800">New agency <span className="font-semibold">Skyline Real Estate</span> registered.</p>
-                  <p className="text-xs text-gray-400 mt-1">2 hours ago</p>
-                </div>
+            <div className="flex gap-4 items-start pb-4 border-b border-gray-50 last:border-0 last:pb-0">
+              <div className="w-2 h-2 rounded-full bg-accent mt-2 shrink-0"></div>
+              <div>
+                <p className="text-sm text-gray-800">New agent <span className="font-semibold">Michael Chen</span> joined Global Tech Agency.</p>
+                <p className="text-xs text-gray-400 mt-1">1 hour ago</p>
               </div>
-            ))}
+            </div>
+            <div className="flex gap-4 items-start pb-4 border-b border-gray-50 last:border-0 last:pb-0">
+              <div className="w-2 h-2 rounded-full bg-accent mt-2 shrink-0"></div>
+              <div>
+                <p className="text-sm text-gray-800">Agency <span className="font-semibold">Skyline Real Estate</span> updated their profile.</p>
+                <p className="text-xs text-gray-400 mt-1">3 hours ago</p>
+              </div>
+            </div>
+            <div className="flex gap-4 items-start pb-4 border-b border-gray-50 last:border-0 last:pb-0">
+              <div className="w-2 h-2 rounded-full bg-accent mt-2 shrink-0"></div>
+              <div>
+                <p className="text-sm text-gray-800">New property owner <span className="font-semibold">Sarah Jenkins</span> registered.</p>
+                <p className="text-xs text-gray-400 mt-1">5 hours ago</p>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -74,10 +86,10 @@ export default function DashboardPage() {
             <h2 className="font-semibold text-lg">Quick Access</h2>
           </div>
           <div className="p-6 grid grid-cols-2 gap-4">
-            <button className="pronimal-btn-primary text-sm">Create New Blog Post</button>
-            <button className="pronimal-btn-accent text-sm">Manage Banners</button>
-            <button className="border border-gray-200 text-gray-600 px-4 py-2 rounded-md hover:bg-gray-50 transition-colors text-sm font-medium">System Settings</button>
-            <button className="border border-gray-200 text-gray-600 px-4 py-2 rounded-md hover:bg-gray-50 transition-colors text-sm font-medium">User Reports</button>
+            <button className="pronimal-btn-primary text-sm">Add New Agent</button>
+            <button className="pronimal-btn-accent text-sm">Manage Agencies</button>
+            <button className="border border-gray-200 text-gray-600 px-4 py-2 rounded-md hover:bg-gray-50 transition-colors text-sm font-medium">Property Reports</button>
+            <button className="border border-gray-200 text-gray-600 px-4 py-2 rounded-md hover:bg-gray-50 transition-colors text-sm font-medium">Owner Requests</button>
           </div>
         </div>
       </div>

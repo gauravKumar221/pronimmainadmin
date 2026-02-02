@@ -8,8 +8,9 @@ import {
   LayoutDashboard, 
   FileText, 
   Image as ImageIcon, 
-  Users, 
+  User, 
   Building2, 
+  Contact,
   LogOut 
 } from 'lucide-react';
 
@@ -17,8 +18,9 @@ const navItems = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { name: 'Blog Management', href: '/dashboard/blog', icon: FileText },
   { name: 'Banner Management', href: '/dashboard/banner', icon: ImageIcon },
-  { name: 'Users', href: '/dashboard/users', icon: Users },
+  { name: 'Agents', href: '/dashboard/agent', icon: User },
   { name: 'Agencies', href: '/dashboard/agency', icon: Building2 },
+  { name: 'Owners', href: '/dashboard/owner', icon: Contact },
 ];
 
 export default function Sidebar() {

@@ -1,22 +1,12 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Mail, 
   Plus, 
   Trash2, 
-  Send, 
   X, 
-  User, 
-  CheckCircle,
-  Bold,
-  Italic,
-  Underline,
-  Type,
-  List,
-  Eraser,
-  Undo2,
-  Redo2
+  User
 } from 'lucide-react';
 
 interface Subscriber {
@@ -29,10 +19,7 @@ interface Subscriber {
 export default function NewsletterPage() {
   const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
   const [isSubscriberModalOpen, setIsSubscriberModalOpen] = useState(false);
-  const [isComposeModalOpen, setIsComposeModalOpen] = useState(false);
   const [email, setEmail] = useState('');
-  const [composerContent, setComposerContent] = useState('');
-  const editorRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const saved = localStorage.getItem('pronimal_subscribers');
@@ -72,31 +59,14 @@ export default function NewsletterPage() {
     }
   };
 
-  const handleSendNewsletter = (e: React.FormEvent) => {
-    e.preventDefault();
-    alert('Newsletter sent to ' + subscribers.filter(s => s.status === 'Active').length + ' subscribers!');
-    setIsComposeModalOpen(false);
-  };
-
-  const execCommand = (command: string, value?: string) => {
-    document.execCommand(command, false, value);
-  };
-
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-primary">Newsletter</h1>
-          <p className="text-gray-500">Manage subscribers and send email updates</p>
+          <p className="text-gray-500">Manage your email subscriber list</p>
         </div>
         <div className="flex gap-3">
-          <button 
-            onClick={() => setIsComposeModalOpen(true)}
-            className="pronimal-btn-primary flex items-center gap-2"
-          >
-            <Send size={18} />
-            <span>Compose Newsletter</span>
-          </button>
           <button 
             onClick={() => setIsSubscriberModalOpen(true)}
             className="pronimal-btn-accent flex items-center gap-2"
@@ -174,8 +144,10 @@ export default function NewsletterPage() {
                 <p className="text-2xl font-black text-primary">+12% <span className="text-xs font-normal text-gray-400 ml-1">this month</span></p>
               </div>
               <div>
-                <p className="text-xs text-gray-500 uppercase font-bold tracking-widest">Open Rate</p>
-                <p className="text-2xl font-black text-primary">68.4%</p>
+                <p className="text-xs text-gray-500 uppercase font-bold tracking-widest">Active Rate</p>
+                <p className="text-2xl font-black text-primary">
+                  {subscribers.length > 0 ? ((subscribers.filter(s => s.status === 'Active').length / subscribers.length) * 100).toFixed(1) : '0'}%
+                </p>
               </div>
             </div>
           </div>
@@ -204,59 +176,6 @@ export default function NewsletterPage() {
               <div className="pt-4 flex gap-3 justify-end">
                 <button type="button" onClick={() => setIsSubscriberModalOpen(false)} className="px-4 py-2 text-gray-600">Cancel</button>
                 <button type="submit" className="pronimal-btn-accent">Add Subscriber</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {isComposeModalOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-4xl w-full shadow-xl animate-in zoom-in-95 overflow-hidden">
-            <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-              <h2 className="text-lg font-bold text-primary flex items-center gap-2">
-                <Send size={18} className="text-accent" />
-                Compose Newsletter
-              </h2>
-              <button onClick={() => setIsComposeModalOpen(false)} className="text-gray-400 hover:text-gray-600"><X size={20} /></button>
-            </div>
-            
-            <form onSubmit={handleSendNewsletter} className="flex flex-col h-[80vh]">
-              <div className="p-6 flex flex-col flex-1 overflow-hidden">
-                <div className="mb-4">
-                  <label className="pronimal-label">Newsletter Subject</label>
-                  <input type="text" className="pronimal-input" placeholder="e.g. Our Monthly Update" required />
-                </div>
-                
-                <div className="flex flex-col h-full overflow-hidden">
-                  <label className="pronimal-label">Content</label>
-                  <div className="border border-gray-200 rounded-t-md bg-gray-50 p-2 flex flex-wrap gap-1 border-b-0">
-                    <button type="button" onClick={() => execCommand('bold')} className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300"><Bold size={16} /></button>
-                    <button type="button" onClick={() => execCommand('italic')} className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300"><Italic size={16} /></button>
-                    <button type="button" onClick={() => execCommand('underline')} className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300"><Underline size={16} /></button>
-                    <div className="w-px h-4 bg-gray-300 mx-1" />
-                    <button type="button" onClick={() => execCommand('formatBlock', '<h1>')} className="p-1.5 hover:bg-white rounded font-bold">H1</button>
-                    <button type="button" onClick={() => execCommand('formatBlock', '<h2>')} className="p-1.5 hover:bg-white rounded font-bold">H2</button>
-                    <button type="button" onClick={() => execCommand('insertUnorderedList')} className="p-1.5 hover:bg-white rounded"><List size={16} /></button>
-                    <div className="w-px h-4 bg-gray-300 mx-1" />
-                    <button type="button" onClick={() => execCommand('undo')} className="p-1.5 hover:bg-white rounded"><Undo2 size={16} /></button>
-                    <button type="button" onClick={() => execCommand('redo')} className="p-1.5 hover:bg-white rounded"><Redo2 size={16} /></button>
-                  </div>
-                  <div
-                    ref={editorRef}
-                    contentEditable
-                    className="flex-1 w-full p-4 border border-gray-200 rounded-b-md focus:outline-none overflow-y-auto bg-white"
-                    placeholder="Write your newsletter here..."
-                  />
-                </div>
-              </div>
-
-              <div className="p-4 flex gap-3 justify-end border-t border-gray-100 bg-gray-50/50">
-                <button type="button" onClick={() => setIsComposeModalOpen(false)} className="px-6 py-2 text-gray-600 font-medium hover:bg-gray-100 rounded-md text-sm">Cancel</button>
-                <button type="submit" className="pronimal-btn-primary px-8 text-sm flex items-center gap-2">
-                  <Send size={16} />
-                  Send to {subscribers.filter(s => s.status === 'Active').length} Subscribers
-                </button>
               </div>
             </form>
           </div>

@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -10,15 +9,15 @@
   --primary: 215 25% 27%; /* #374151 - Dark Slate Blue */
   --primary-foreground: 0 0% 100%;
 
-  --accent: 161 64% 52%; /* #34D399 - Teal */
-  --accent-foreground: 215 25% 27%;
+  --accent: 2 100% 54%; /* #ff1c14 - Red */
+  --accent-foreground: 0 0% 100%;
 
   --card: 0 0% 100%;
   --card-foreground: 215 25% 27%;
 
   --border: 214 32% 91%;
   --input: 214 32% 91%;
-  --ring: 161 64% 52%;
+  --ring: 2 100% 54%;
 
   --radius: 0.5rem;
 }
@@ -41,11 +40,11 @@
 }
 
 .adminix-btn-accent {
-  @apply bg-[#34D399] text-[#374151] px-4 py-2 rounded-md hover:bg-[#2bc28a] transition-colors duration-200 disabled:opacity-50 font-medium;
+  @apply bg-[#ff1c14] text-white px-4 py-2 rounded-md hover:bg-[#e01811] transition-colors duration-200 disabled:opacity-50 font-medium;
 }
 
 .adminix-input {
-  @apply w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#34D399] focus:border-transparent transition-all;
+  @apply w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#ff1c14] focus:border-transparent transition-all;
 }
 
 .adminix-label {

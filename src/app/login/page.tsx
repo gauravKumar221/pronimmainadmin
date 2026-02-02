@@ -1,8 +1,8 @@
-
 'use client';
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { loginAction } from './actions';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -16,20 +16,18 @@ export default function LoginPage() {
     setIsLoading(true);
     setError('');
 
-    // Updated credentials as requested
-    const ADMIN_USERNAME = 'gaurav kumar';
-    const ADMIN_EMAIL = 'gauravaj@gmail.com';
-    const ADMIN_PASSWORD = 'gaurav@221';
+    try {
+      // Call the server action to verify credentials securely
+      const result = await loginAction(identifier, password);
 
-    if (
-      (identifier === ADMIN_USERNAME || identifier === ADMIN_EMAIL) &&
-      password === ADMIN_PASSWORD
-    ) {
-      // Set auth cookie (using document.cookie as simple solution)
-      document.cookie = 'admin_auth=true; path=/; max-age=3600';
-      router.push('/dashboard');
-    } else {
-      setError('Invalid username/email or password');
+      if (result.success) {
+        router.push('/dashboard');
+      } else {
+        setError(result.error || 'Invalid login attempt');
+        setIsLoading(false);
+      }
+    } catch (err) {
+      setError('An unexpected error occurred. Please try again.');
       setIsLoading(false);
     }
   };
@@ -57,7 +55,7 @@ export default function LoginPage() {
               id="identifier"
               type="text"
               className="adminix-input"
-              placeholder="gaurav kumar / gauravaj@gmail.com"
+              placeholder="Username or Email"
               value={identifier}
               onChange={(e) => setIdentifier(e.target.value)}
               required
@@ -89,7 +87,7 @@ export default function LoginPage() {
         </form>
 
         <div className="mt-8 text-center text-xs text-gray-400">
-          <p>Demo credentials: gaurav kumar / gaurav@221</p>
+          <p>Credentials are now managed via environment variables.</p>
         </div>
       </div>
     </div>

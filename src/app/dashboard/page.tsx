@@ -48,20 +48,6 @@ export default function DashboardPage() {
           </div>
         ))}
       </div>
-
-      <div className="grid grid-cols-1 gap-8">
-        <div className="pronimal-card">
-          <div className="p-6 border-b border-gray-100">
-            <h2 className="font-semibold text-lg">Quick Access</h2>
-          </div>
-          <div className="p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-            <button className="pronimal-btn-primary text-sm py-3">Add New Agent</button>
-            <button className="pronimal-btn-accent text-sm py-3">Manage Agencies</button>
-            <button className="border border-gray-200 text-gray-600 px-4 py-3 rounded-md hover:bg-gray-50 transition-colors text-sm font-medium">Property Reports</button>
-            <button className="border border-gray-200 text-gray-600 px-4 py-3 rounded-md hover:bg-gray-50 transition-colors text-sm font-medium">Owner Requests</button>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

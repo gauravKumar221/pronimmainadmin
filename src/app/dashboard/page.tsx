@@ -1,7 +1,17 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { User, Building2, Contact, FileText, Clock } from 'lucide-react';
+import Link from 'next/link';
+import { 
+  User, 
+  Building2, 
+  Contact, 
+  FileText, 
+  Clock, 
+  Image as ImageIcon, 
+  HelpCircle,
+  ArrowRight
+} from 'lucide-react';
 
 export default function DashboardPage() {
   const [loginTime, setLoginTime] = useState<string | null>(null);
@@ -18,6 +28,12 @@ export default function DashboardPage() {
     { name: 'Active Agencies', value: '42', icon: Building2, color: 'text-accent', bg: 'bg-green-50' },
     { name: 'Total Owners', value: '89', icon: Contact, color: 'text-purple-600', bg: 'bg-purple-50' },
     { name: 'Blog Posts', value: '12', icon: FileText, color: 'text-orange-600', bg: 'bg-orange-50' },
+  ];
+
+  const quickNav = [
+    { name: 'Blog Manager', href: '/dashboard/blog', icon: FileText, desc: 'Create and edit articles' },
+    { name: 'Banner Manager', href: '/dashboard/banner', icon: ImageIcon, desc: 'Manage hero sliders' },
+    { name: 'FAQ Manager', href: '/dashboard/faqs', icon: HelpCircle, desc: 'Update support questions' },
   ];
 
   return (
@@ -47,6 +63,34 @@ export default function DashboardPage() {
             </div>
           </div>
         ))}
+      </div>
+
+      <div className="space-y-4">
+        <h2 className="text-lg font-bold text-primary flex items-center gap-2">
+          Quick Management
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {quickNav.map((item) => (
+            <Link 
+              key={item.name} 
+              href={item.href}
+              className="pronimal-card p-6 hover:border-accent transition-all group"
+            >
+              <div className="flex items-start justify-between">
+                <div className="space-y-3">
+                  <div className="bg-gray-50 text-accent p-3 rounded-lg w-fit group-hover:bg-accent group-hover:text-white transition-colors">
+                    <item.icon size={24} />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-primary">{item.name}</h3>
+                    <p className="text-sm text-gray-500">{item.desc}</p>
+                  </div>
+                </div>
+                <ArrowRight size={20} className="text-gray-300 group-hover:text-accent transition-all" />
+              </div>
+            </Link>
+          ))}
+        </div>
       </div>
     </div>
   );

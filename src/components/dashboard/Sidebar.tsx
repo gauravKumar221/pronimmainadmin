@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { 
@@ -37,12 +37,28 @@ const navItems = [
 export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleLogout = () => {
     document.cookie = 'admin_auth=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT';
     localStorage.removeItem('pronimal_last_login');
     router.push('/login');
   };
+
+  if (!mounted) {
+    return (
+      <aside className="w-64 bg-primary text-white flex flex-col h-screen sticky top-0">
+        <div className="p-6">
+          <h1 className="text-2xl font-bold tracking-tight">Pronim.al</h1>
+        </div>
+        <div className="flex-1 px-4 space-y-1"></div>
+      </aside>
+    );
+  }
 
   return (
     <aside className="w-64 bg-primary text-white flex flex-col h-screen sticky top-0">

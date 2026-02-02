@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -15,14 +14,11 @@ import {
   AlignCenter,
   ListOrdered,
   List,
-  Undo2,
-  Redo2,
-  Eraser
 } from 'lucide-react';
 
 export default function AboutUsPage() {
   const [content, setContent] = useState<string>('');
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const editorRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -58,7 +54,7 @@ export default function AboutUsPage() {
     e.preventDefault();
     const finalContent = editorRef.current?.innerHTML || content;
     saveProfile(finalContent);
-    setIsModalOpen(false);
+    setIsProfileModalOpen(false);
   };
 
   const execCommand = (command: string, value?: string) => {
@@ -73,7 +69,7 @@ export default function AboutUsPage() {
           <p className="text-gray-500">Manage your company story and mission</p>
         </div>
         <button 
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => setIsProfileModalOpen(true)}
           className="pronimal-btn-accent flex items-center gap-2"
         >
           <Pencil size={18} />
@@ -92,7 +88,7 @@ export default function AboutUsPage() {
         />
       </div>
 
-      {isModalOpen && (
+      {isProfileModalOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg max-w-5xl w-full shadow-xl animate-in zoom-in-95 overflow-hidden">
             <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
@@ -100,7 +96,7 @@ export default function AboutUsPage() {
                 <Pencil className="text-accent" size={18} />
                 <h2 className="text-lg font-bold text-primary">About Us Editor</h2>
               </div>
-              <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-gray-600">
+              <button onClick={() => setIsProfileModalOpen(false)} className="text-gray-400 hover:text-gray-600">
                 <X size={20} />
               </button>
             </div>
@@ -121,8 +117,6 @@ export default function AboutUsPage() {
                       <div className="w-px h-4 bg-gray-300 mx-1" />
                       <button type="button" onClick={() => execCommand('insertUnorderedList')} className="p-1.5 hover:bg-white rounded"><List size={16} /></button>
                       <button type="button" onClick={() => execCommand('insertOrderedList')} className="p-1.5 hover:bg-white rounded"><ListOrdered size={16} /></button>
-                      <button type="button" onClick={() => execCommand('justifyLeft')} className="p-1.5 hover:bg-white rounded"><AlignLeft size={16} /></button>
-                      <button type="button" onClick={() => execCommand('justifyCenter')} className="p-1.5 hover:bg-white rounded"><AlignCenter size={16} /></button>
                     </div>
                   </div>
 
@@ -136,7 +130,7 @@ export default function AboutUsPage() {
               </div>
 
               <div className="p-4 flex gap-3 justify-end border-t border-gray-100 bg-gray-50/50">
-                <button type="button" onClick={() => setIsModalOpen(false)} className="px-6 py-2 text-gray-600 font-medium hover:bg-gray-100 rounded-md text-sm">Cancel</button>
+                <button type="button" onClick={() => setIsProfileModalOpen(false)} className="px-6 py-2 text-gray-600 font-medium hover:bg-gray-100 rounded-md text-sm">Cancel</button>
                 <button type="submit" className="pronimal-btn-primary px-8 text-sm">Save Profile</button>
               </div>
             </form>

@@ -1,6 +1,7 @@
+
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { 
@@ -18,6 +19,18 @@ import {
   Mail,
   MessageSquare
 } from 'lucide-react';
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  useSidebar,
+} from "@/components/ui/sidebar"
 
 const navItems = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -34,14 +47,10 @@ const navItems = [
   { name: 'Terms & Conditions', href: '/dashboard/terms', icon: FileCheck },
 ];
 
-export default function Sidebar() {
+export default function AppSidebar() {
   const pathname = usePathname();
   const router = useRouter();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const { state } = useSidebar();
 
   const handleLogout = () => {
     document.cookie = 'admin_auth=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT';
@@ -49,52 +58,64 @@ export default function Sidebar() {
     router.push('/login');
   };
 
-  if (!mounted) {
-    return (
-      <aside className="w-64 bg-primary text-white flex flex-col h-screen sticky top-0">
-        <div className="p-6">
-          <h1 className="text-2xl font-bold tracking-tight">Pronim.al</h1>
-        </div>
-        <div className="flex-1 px-4 space-y-1"></div>
-      </aside>
-    );
-  }
-
   return (
-    <aside className="w-64 bg-primary text-white flex flex-col h-screen sticky top-0">
-      <div className="p-6">
-        <h1 className="text-2xl font-bold tracking-tight">Pronim.al</h1>
-      </div>
+    <Sidebar collapsible="icon" className="border-r-0">
+      <SidebarHeader className="p-4 flex flex-row items-center gap-2 overflow-hidden bg-primary h-16 shrink-0">
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-accent text-white">
+          <span className="font-bold text-lg">P</span>
+        </div>
+        {state === "expanded" && (
+          <h1 className="text-xl font-bold tracking-tight text-white truncate">Pronim.al</h1>
+        )}
+      </SidebarHeader>
+      
+      <SidebarContent className="bg-primary">
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {navItems.map((item) => {
+                const isActive = pathname === item.href;
+                return (
+                  <SidebarMenuItem key={item.name}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={isActive}
+                      tooltip={item.name}
+                      className={`
+                        transition-all duration-200
+                        ${isActive 
+                          ? 'bg-accent text-white hover:bg-accent/90' 
+                          : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+                        }
+                      `}
+                    >
+                      <Link href={item.href}>
+                        <item.icon size={20} />
+                        <span>{item.name}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
 
-      <nav className="flex-1 px-4 space-y-1 overflow-y-auto pb-4">
-        {navItems.map((item) => {
-          const isActive = pathname === item.href;
-          return (
-            <Link
-              key={item.name}
-              href={item.href}
-              className={`flex items-center gap-3 px-4 py-3 rounded-md transition-colors ${
-                isActive 
-                  ? 'bg-accent text-white font-semibold' 
-                  : 'text-gray-300 hover:bg-gray-700 hover:text-white'
-              }`}
+      <SidebarFooter className="p-2 border-t border-gray-700 bg-primary">
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              onClick={handleLogout}
+              tooltip="Logout"
+              className="text-gray-300 hover:bg-red-600 hover:text-white transition-colors"
             >
-              <item.icon size={20} />
-              <span>{item.name}</span>
-            </Link>
-          );
-        })}
-      </nav>
-
-      <div className="p-4 border-t border-gray-700">
-        <button
-          onClick={handleLogout}
-          className="flex items-center gap-3 px-4 py-3 w-full rounded-md text-gray-300 hover:bg-red-600 hover:text-white transition-colors"
-        >
-          <LogOut size={20} />
-          <span>Logout</span>
-        </button>
-      </div>
-    </aside>
+              <LogOut size={20} />
+              <span>Logout</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
+    </Sidebar>
   );
 }

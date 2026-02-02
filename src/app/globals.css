@@ -21,6 +21,16 @@
   --ring: 2 100% 54%;
 
   --radius: 0.5rem;
+
+  /* Sidebar Theme */
+  --sidebar-background: 0 0% 35%;
+  --sidebar-foreground: 0 0% 100%;
+  --sidebar-primary: 2 100% 54%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 0 0% 45%;
+  --sidebar-accent-foreground: 0 0% 100%;
+  --sidebar-border: 0 0% 45%;
+  --sidebar-ring: 2 100% 54%;
 }
 
 @layer base {

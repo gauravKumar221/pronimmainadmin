@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { 
   Pencil, 
   X, 
-  Info,
+  MessageCircleQuestion,
   Bold,
   Italic,
   Underline,
@@ -27,38 +27,37 @@ import {
   Printer
 } from 'lucide-react';
 
-export default function AboutUsPage() {
+export default function AboutUsFAQPage() {
   const [content, setContent] = useState<string>('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const editorRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const saved = localStorage.getItem('pronimal_about_v3');
+    const saved = localStorage.getItem('pronimal_about_faq');
     if (saved) {
       setContent(saved);
     } else {
       const initial = `
-        <h1>Our Vision</h1>
-        <p>Pronim.al was founded with a single mission: to revolutionize how real estate agencies and agents manage their relationships with property owners. We believe in providing simple, powerful, and beautiful tools that make professional management accessible to everyone.</p>
+        <h1>About Us Frequently Asked Questions</h1>
+        <p>This section addresses specific questions related to our company's history, operations, and policies.</p>
         
-        <h2>Our Story</h2>
-        <p>Based in the heart of the tech industry, we combine cutting-edge technology with deep industry expertise to deliver a dashboard that truly works for you. Our team is dedicated to building the most intuitive administrative experience on the market.</p>
+        <h2>How was Pronim.al started?</h2>
+        <p>Pronim.al was started by a team of real estate professionals and tech innovators who saw a gap in the market for high-quality, professional administration tools for property owners and agencies.</p>
         
-        <h2>Core Values</h2>
-        <ul>
-          <li><strong>Transparency:</strong> We believe in open communication and honest data management.</li>
-          <li><strong>Innovation:</strong> Constantly pushing the boundaries of what a dashboard can do.</li>
-          <li><strong>User First:</strong> Every feature is designed with the user's efficiency in mind.</li>
-        </ul>
+        <h2>What makes us different?</h2>
+        <p>Unlike other platforms, we focus exclusively on the admin experience, ensuring that every tool we build is optimized for speed, clarity, and ease of use.</p>
+        
+        <h2>Can I visit your office?</h2>
+        <p>While we are a remote-first company, we maintain a central hub in the tech district and frequently host industry events. Contact our support team for more details!</p>
       `;
       setContent(initial);
-      localStorage.setItem('pronimal_about_v3', initial);
+      localStorage.setItem('pronimal_about_faq', initial);
     }
   }, []);
 
   const saveContent = (newContent: string) => {
     setContent(newContent);
-    localStorage.setItem('pronimal_about_v3', newContent);
+    localStorage.setItem('pronimal_about_faq', newContent);
   };
 
   const handleEdit = () => {
@@ -84,22 +83,22 @@ export default function AboutUsPage() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-primary">About Us</h1>
-          <p className="text-gray-500">Manage your company story and mission</p>
+          <h1 className="text-2xl font-bold text-primary">About Us FAQ</h1>
+          <p className="text-gray-500">Manage frequently asked questions about your company</p>
         </div>
         <button 
           onClick={handleEdit}
           className="pronimal-btn-accent flex items-center gap-2"
         >
           <Pencil size={18} />
-          <span>Edit About Us</span>
+          <span>Edit About FAQ</span>
         </button>
       </div>
 
       <div className="pronimal-card p-10">
         <div className="flex items-center gap-2 mb-8 pb-4 border-b border-gray-100">
-          <Info className="text-accent" size={24} />
-          <h2 className="text-xl font-bold text-primary">Company Profile</h2>
+          <MessageCircleQuestion className="text-accent" size={24} />
+          <h2 className="text-xl font-bold text-primary">FAQ Document</h2>
         </div>
 
         <div 
@@ -114,7 +113,7 @@ export default function AboutUsPage() {
             <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
               <div className="flex items-center gap-2">
                 <Pencil className="text-accent" size={18} />
-                <h2 className="text-lg font-bold text-primary">About Us Editor</h2>
+                <h2 className="text-lg font-bold text-primary">About FAQ Editor</h2>
               </div>
               <button onClick={closeModal} className="text-gray-400 hover:text-gray-600">
                 <X size={20} />
@@ -191,7 +190,7 @@ export default function AboutUsPage() {
                   Cancel
                 </button>
                 <button type="submit" className="pronimal-btn-primary px-8 text-sm">
-                  Save About Us
+                  Save About FAQ
                 </button>
               </div>
             </form>

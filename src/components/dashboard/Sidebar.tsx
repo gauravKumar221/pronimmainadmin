@@ -1,4 +1,3 @@
-
 'use client';
 
 import React from 'react';
@@ -11,6 +10,10 @@ import {
   User, 
   Building2, 
   Contact,
+  Info,
+  HelpCircle,
+  ShieldCheck,
+  FileCheck,
   LogOut 
 } from 'lucide-react';
 
@@ -21,6 +24,10 @@ const navItems = [
   { name: 'Agents', href: '/dashboard/agent', icon: User },
   { name: 'Agencies', href: '/dashboard/agency', icon: Building2 },
   { name: 'Owners', href: '/dashboard/owner', icon: Contact },
+  { name: 'About Us', href: '/dashboard/about', icon: Info },
+  { name: 'FAQs', href: '/dashboard/faqs', icon: HelpCircle },
+  { name: 'Privacy Policy', href: '/dashboard/privacy', icon: ShieldCheck },
+  { name: 'Terms & Conditions', href: '/dashboard/terms', icon: FileCheck },
 ];
 
 export default function Sidebar() {
@@ -41,7 +48,7 @@ export default function Sidebar() {
         <h1 className="text-2xl font-bold tracking-tight">Pronim.al</h1>
       </div>
 
-      <nav className="flex-1 px-4 space-y-1">
+      <nav className="flex-1 px-4 space-y-1 overflow-y-auto pb-4">
         {navItems.map((item) => {
           const isActive = pathname === item.href;
           return (

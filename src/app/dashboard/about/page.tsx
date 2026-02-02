@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -9,8 +10,6 @@ import {
   Italic,
   Underline,
   Strikethrough,
-  Subscript,
-  Superscript,
   Type,
   AlignLeft,
   AlignCenter,

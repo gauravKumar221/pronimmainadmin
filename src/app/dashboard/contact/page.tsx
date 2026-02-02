@@ -40,15 +40,6 @@ export default function ContactInquiriesPage() {
           message: 'Hello, I am interested in partnering with Pronim.al for our real estate projects in London. Looking forward to hearing from you.',
           createdAt: new Date(Date.now() - 3600000).toISOString(),
           isRead: false
-        },
-        {
-          id: '2',
-          name: 'Sarah Connor',
-          email: 'sarah.c@tech.io',
-          subject: 'Dashboard Question',
-          message: 'How do I export my agent list to a CSV file?',
-          createdAt: new Date(Date.now() - 86400000).toISOString(),
-          isRead: true
         }
       ];
       setMessages(initialMessages);
@@ -124,16 +115,10 @@ export default function ContactInquiriesPage() {
                     </span>
                   </td>
                   <td className="text-right space-x-2">
-                    <button 
-                      onClick={() => openMessage(msg)}
-                      className="text-blue-600 hover:bg-blue-50 p-2 rounded-md transition-colors"
-                    >
+                    <button onClick={() => openMessage(msg)} className="text-blue-600 hover:bg-blue-50 p-2 rounded-md transition-colors">
                       <Eye size={18} />
                     </button>
-                    <button 
-                      onClick={() => deleteMessage(msg.id)}
-                      className="text-red-500 hover:bg-red-50 p-2 rounded-md transition-colors"
-                    >
+                    <button onClick={() => deleteMessage(msg.id)} className="text-red-500 hover:bg-red-50 p-2 rounded-md transition-colors">
                       <Trash2 size={18} />
                     </button>
                   </td>
@@ -155,10 +140,7 @@ export default function ContactInquiriesPage() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg max-w-2xl w-full shadow-xl animate-in zoom-in-95">
             <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-              <div className="flex items-center gap-2">
-                <MessageSquare className="text-accent" size={18} />
-                <h2 className="text-lg font-bold text-primary">Message Details</h2>
-              </div>
+              <h2 className="text-lg font-bold text-primary">Message Details</h2>
               <button onClick={() => setIsViewModalOpen(false)} className="text-gray-400 hover:text-gray-600">
                 <X size={24} />
               </button>
@@ -176,27 +158,14 @@ export default function ContactInquiriesPage() {
                   <p className="font-bold text-primary flex items-center gap-2"><Clock size={14} className="text-accent" /> {new Date(selectedMessage.createdAt).toLocaleString()}</p>
                 </div>
               </div>
-              
-              <div className="space-y-2">
-                <p className="text-gray-400 uppercase text-[10px] font-bold tracking-widest">Subject</p>
-                <p className="text-lg font-bold text-primary">{selectedMessage.subject}</p>
-              </div>
-
-              <div className="space-y-2">
-                <p className="text-gray-400 uppercase text-[10px] font-bold tracking-widest">Message</p>
-                <div className="bg-gray-50 p-6 rounded-lg text-gray-700 leading-relaxed whitespace-pre-wrap">
-                  {selectedMessage.message}
-                </div>
+              <div className="bg-gray-50 p-6 rounded-lg text-gray-700 leading-relaxed whitespace-pre-wrap">
+                <p className="font-bold mb-2">Subject: {selectedMessage.subject}</p>
+                {selectedMessage.message}
               </div>
             </div>
 
             <div className="p-4 flex justify-end border-t border-gray-100 bg-gray-50/50">
-              <button 
-                onClick={() => setIsViewModalOpen(false)}
-                className="pronimal-btn-primary px-8"
-              >
-                Close
-              </button>
+              <button onClick={() => setIsViewModalOpen(false)} className="pronimal-btn-primary px-8">Close</button>
             </div>
           </div>
         </div>

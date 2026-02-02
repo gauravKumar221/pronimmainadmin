@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -27,7 +28,6 @@ export default function FAQsPage() {
   });
 
   useEffect(() => {
-    // Load General FAQs
     const savedGeneral = localStorage.getItem('pronimal_faqs');
     if (savedGeneral) {
       setGeneralFaqs(JSON.parse(savedGeneral));
@@ -40,13 +40,12 @@ export default function FAQsPage() {
       localStorage.setItem('pronimal_faqs', JSON.stringify(initialGeneral));
     }
 
-    // Load About Us FAQs
     const savedAbout = localStorage.getItem('pronimal_about_faq_list');
     if (savedAbout) {
       setAboutUsFaqs(JSON.parse(savedAbout));
     } else {
       const initialAbout = [
-        { id: 'a1', question: "How was Pronim.al started?", answer: "Started by a team of real estate professionals and tech innovators." }
+        { id: 'a1', question: "How was Pronim.al started?", answer: "Started by a team of real estate professionals and tech innovators who saw a gap in the market for high-quality administration tools." }
       ];
       setAboutUsFaqs(initialAbout);
       localStorage.setItem('pronimal_about_faq_list', JSON.stringify(initialAbout));
@@ -115,17 +114,13 @@ export default function FAQsPage() {
         <p className="text-gray-500">Manage all your dashboard and company related questions</p>
       </div>
 
-      {/* General FAQs Section */}
       <div className="space-y-4">
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">
             <HelpCircle size={20} className="text-accent" />
             <h2 className="text-xl font-bold text-primary">General FAQs</h2>
           </div>
-          <button 
-            onClick={() => openModal('general')}
-            className="pronimal-btn-accent flex items-center gap-2"
-          >
+          <button onClick={() => openModal('general')} className="pronimal-btn-accent flex items-center gap-2">
             <Plus size={18} />
             <span>Add General FAQ</span>
           </button>
@@ -148,7 +143,7 @@ export default function FAQsPage() {
                       </button>
                     </div>
                   </div>
-                  <AccordionContent className="text-gray-600 leading-relaxed">
+                  <AccordionContent className="text-gray-600">
                     {faq.answer}
                   </AccordionContent>
                 </AccordionItem>
@@ -160,17 +155,13 @@ export default function FAQsPage() {
         </div>
       </div>
 
-      {/* About Us FAQs Section */}
       <div className="space-y-4">
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">
             <Info size={20} className="text-accent" />
             <h2 className="text-xl font-bold text-primary">About Us FAQs</h2>
           </div>
-          <button 
-            onClick={() => openModal('about')}
-            className="pronimal-btn-accent flex items-center gap-2"
-          >
+          <button onClick={() => openModal('about')} className="pronimal-btn-accent flex items-center gap-2">
             <Plus size={18} />
             <span>Add About FAQ</span>
           </button>
@@ -193,7 +184,7 @@ export default function FAQsPage() {
                       </button>
                     </div>
                   </div>
-                  <AccordionContent className="text-gray-600 leading-relaxed">
+                  <AccordionContent className="text-gray-600">
                     {faq.answer}
                   </AccordionContent>
                 </AccordionItem>
@@ -205,20 +196,12 @@ export default function FAQsPage() {
         </div>
       </div>
 
-      <div className="bg-white border border-gray-100 p-8 rounded-lg text-center space-y-4">
-        <h2 className="text-lg font-bold text-primary">Still have questions?</h2>
-        <p className="text-gray-500 max-w-md mx-auto">
-          Reach out to our support team for assistance.
-        </p>
-        <button className="pronimal-btn-accent">Contact Support</button>
-      </div>
-
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg max-w-lg w-full shadow-xl animate-in zoom-in-95">
             <div className="p-6 border-b border-gray-100 flex justify-between items-center">
               <h2 className="text-xl font-bold text-primary">
-                {editingFaq ? 'Edit FAQ' : `Add New ${modalType === 'general' ? 'General' : 'About Us'} FAQ`}
+                {editingFaq ? 'Edit FAQ' : `Add ${modalType === 'general' ? 'General' : 'About Us'} FAQ`}
               </h2>
               <button onClick={closeModal} className="text-gray-400 hover:text-gray-600">
                 <X size={24} />

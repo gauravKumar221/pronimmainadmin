@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -66,15 +67,13 @@ export default function NewsletterPage() {
           <h1 className="text-2xl font-bold text-primary">Newsletter</h1>
           <p className="text-gray-500">Manage your email subscriber list</p>
         </div>
-        <div className="flex gap-3">
-          <button 
-            onClick={() => setIsSubscriberModalOpen(true)}
-            className="pronimal-btn-accent flex items-center gap-2"
-          >
-            <Plus size={18} />
-            <span>Add Subscriber</span>
-          </button>
-        </div>
+        <button 
+          onClick={() => setIsSubscriberModalOpen(true)}
+          className="pronimal-btn-accent flex items-center gap-2"
+        >
+          <Plus size={18} />
+          <span>Add Subscriber</span>
+        </button>
       </div>
 
       <div className="pronimal-card">
@@ -145,7 +144,7 @@ export default function NewsletterPage() {
                   value={email} 
                   onChange={(e) => setEmail(e.target.value)} 
                   required 
-                  placeholder="e.g. subscriber@example.com"
+                  placeholder="subscriber@example.com"
                 />
               </div>
               <div className="pt-4 flex gap-3 justify-end">

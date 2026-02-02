@@ -2,29 +2,15 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { 
-  PhoneCall, 
-  Mail, 
-  MapPin, 
-  Clock,
-  Save
-} from 'lucide-react';
-
-interface ContactInfo {
-  address: string;
-  phone: string;
-  email: string;
-  workingHours: string;
-}
+import { PhoneCall, Mail, MapPin, Clock, Save } from 'lucide-react';
 
 export default function ContactInfoPage() {
-  const [info, setInfo] = useState<ContactInfo>({
+  const [info, setInfo] = useState({
     address: '123 Tech Avenue, Innovation District, SF',
     phone: '+1 (555) 000-1111',
     email: 'contact@pronim.al',
     workingHours: 'Mon - Fri: 9:00 AM - 6:00 PM',
   });
-
   const [success, setSuccess] = useState('');
 
   useEffect(() => {
@@ -62,58 +48,28 @@ export default function ContactInfoPage() {
         <form onSubmit={handleInfoSave} className="p-8 space-y-6 max-w-2xl">
           <div className="grid grid-cols-1 gap-6">
             <div>
-              <label className="pronimal-label flex items-center gap-2">
-                <MapPin size={16} /> Office Address
-              </label>
-              <input 
-                className="pronimal-input" 
-                value={info.address} 
-                onChange={e => setInfo({...info, address: e.target.value})}
-                placeholder="Full office address"
-              />
+              <label className="pronimal-label flex items-center gap-2"><MapPin size={16} /> Office Address</label>
+              <input className="pronimal-input" value={info.address} onChange={e => setInfo({...info, address: e.target.value})} />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="pronimal-label flex items-center gap-2">
-                  <PhoneCall size={16} /> Phone Number
-                </label>
-                <input 
-                  className="pronimal-input" 
-                  value={info.phone} 
-                  onChange={e => setInfo({...info, phone: e.target.value})}
-                  placeholder="+1 (000) 000-0000"
-                />
+                <label className="pronimal-label flex items-center gap-2"><PhoneCall size={16} /> Phone Number</label>
+                <input className="pronimal-input" value={info.phone} onChange={e => setInfo({...info, phone: e.target.value})} />
               </div>
               <div>
-                <label className="pronimal-label flex items-center gap-2">
-                  <Mail size={16} /> Contact Email
-                </label>
-                <input 
-                  className="pronimal-input" 
-                  value={info.email} 
-                  onChange={e => setInfo({...info, email: e.target.value})}
-                  placeholder="email@example.com"
-                />
+                <label className="pronimal-label flex items-center gap-2"><Mail size={16} /> Contact Email</label>
+                <input className="pronimal-input" value={info.email} onChange={e => setInfo({...info, email: e.target.value})} />
               </div>
             </div>
             <div>
-              <label className="pronimal-label flex items-center gap-2">
-                <Clock size={16} /> Working Hours
-              </label>
-              <input 
-                className="pronimal-input" 
-                value={info.workingHours} 
-                onChange={e => setInfo({...info, workingHours: e.target.value})}
-                placeholder="e.g. Mon - Fri: 9am - 5pm"
-              />
+              <label className="pronimal-label flex items-center gap-2"><Clock size={16} /> Working Hours</label>
+              <input className="pronimal-input" value={info.workingHours} onChange={e => setInfo({...info, workingHours: e.target.value})} />
             </div>
           </div>
-          <div className="pt-4">
-            <button type="submit" className="pronimal-btn-primary flex items-center gap-2">
-              <Save size={18} />
-              Save Contact Details
-            </button>
-          </div>
+          <button type="submit" className="pronimal-btn-primary flex items-center gap-2">
+            <Save size={18} />
+            Save Contact Details
+          </button>
         </form>
       </div>
     </div>

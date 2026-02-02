@@ -2,9 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { 
-  Plus, 
   Pencil, 
-  Trash2, 
   X, 
   FileText,
   Bold,
@@ -13,7 +11,6 @@ import {
   Strikethrough,
   Subscript,
   Superscript,
-  ChevronDown,
   Highlighter,
   Type,
   AlignLeft,
@@ -26,110 +23,68 @@ import {
   Indent,
   Link as LinkIcon,
   Image as ImageIcon,
-  Video,
-  Volume2,
-  Table,
   Eraser,
   Printer,
-  Code,
-  Maximize2,
   Undo2,
   Redo2
 } from 'lucide-react';
 
-interface PrivacySection {
-  id: string;
-  title: string;
-  content: string;
-}
-
 export default function PrivacyPolicyPage() {
-  const [sections, setSections] = useState<PrivacySection[]>([]);
+  const [content, setContent] = useState<string>('');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingSection, setEditingSection] = useState<PrivacySection | null>(null);
-  const [formData, setFormData] = useState({
-    title: '',
-    content: '',
-  });
-  
   const editorRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const saved = localStorage.getItem('pronimal_privacy');
+    const saved = localStorage.getItem('pronimal_privacy_v2');
     if (saved) {
-      setSections(JSON.parse(saved));
+      setContent(saved);
     } else {
-      const initial = [
-        {
-          id: '1',
-          title: "1. Introduction",
-          content: "Welcome to Pronim.al. We are committed to protecting your personal information and your right to privacy. If you have any questions or concerns about our policy, or our practices with regards to your personal information, please contact us."
-        },
-        {
-          id: '2',
-          title: "2. Information We Collect",
-          content: "We collect personal information that you voluntarily provide to us when registering at the Services, expressing an interest in obtaining information about us or our products and services, or otherwise contacting us."
-        }
-      ];
-      setSections(initial);
-      localStorage.setItem('pronimal_privacy', JSON.stringify(initial));
+      const initial = `
+        <h1>Privacy Policy</h1>
+        <p>Last updated: ${new Date().toLocaleDateString()}</p>
+        
+        <h2>1. Introduction</h2>
+        <p>Welcome to Pronim.al. We are committed to protecting your personal information and your right to privacy. If you have any questions or concerns about our policy, or our practices with regards to your personal information, please contact us.</p>
+        
+        <h2>2. Information We Collect</h2>
+        <p>We collect personal information that you voluntarily provide to us when registering at the Services, expressing an interest in obtaining information about us or our products and services, or otherwise contacting us.</p>
+        
+        <h2>3. How We Use Your Information</h2>
+        <p>We use personal information collected via our Services for a variety of business purposes. We process your personal information for these purposes in reliance on our legitimate business interests, in order to enter into or perform a contract with you, with your consent, and/or for compliance with our legal obligations.</p>
+        
+        <h2>4. Sharing Your Information</h2>
+        <p>We only share information with your consent, to comply with laws, to provide you with services, to protect your rights, or to fulfill business obligations.</p>
+        
+        <h2>5. Data Security</h2>
+        <p>We aim to protect your personal information through a system of organizational and technical security measures.</p>
+      `;
+      setContent(initial);
+      localStorage.setItem('pronimal_privacy_v2', initial);
     }
   }, []);
 
-  const saveSections = (updated: PrivacySection[]) => {
-    setSections(updated);
-    localStorage.setItem('pronimal_privacy', JSON.stringify(updated));
+  const saveContent = (newContent: string) => {
+    setContent(newContent);
+    localStorage.setItem('pronimal_privacy_v2', newContent);
   };
 
-  const openModal = (section?: PrivacySection) => {
-    if (section) {
-      setEditingSection(section);
-      setFormData({
-        title: section.title,
-        content: section.content,
-      });
-    } else {
-      setEditingSection(null);
-      setFormData({ title: '', content: '' });
-    }
+  const handleEdit = () => {
     setIsModalOpen(true);
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
-    setEditingSection(null);
-    setFormData({ title: '', content: '' });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const finalContent = editorRef.current?.innerHTML || formData.content;
-    let updated;
-    if (editingSection) {
-      updated = sections.map(s => s.id === editingSection.id ? { ...s, title: formData.title, content: finalContent } : s);
-    } else {
-      const newSection = {
-        id: Math.random().toString(36).substr(2, 9),
-        title: formData.title,
-        content: finalContent,
-      };
-      updated = [...sections, newSection];
-    }
-    saveSections(updated);
+    const finalContent = editorRef.current?.innerHTML || content;
+    saveContent(finalContent);
     closeModal();
-  };
-
-  const handleDelete = (id: string) => {
-    if (confirm('Are you sure you want to delete this privacy policy section?')) {
-      saveSections(sections.filter(s => s.id !== id));
-    }
   };
 
   const execCommand = (command: string, value?: string) => {
     document.execCommand(command, false, value);
-    if (editorRef.current) {
-      setFormData(prev => ({ ...prev, content: editorRef.current?.innerHTML || '' }));
-    }
   };
 
   return (
@@ -137,67 +92,36 @@ export default function PrivacyPolicyPage() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-primary">Privacy Policy</h1>
-          <p className="text-gray-500">How we handle and protect your data</p>
+          <p className="text-gray-500">Manage the global privacy policy document</p>
         </div>
         <button 
-          onClick={() => openModal()}
+          onClick={handleEdit}
           className="pronimal-btn-accent flex items-center gap-2"
         >
-          <Plus size={18} />
-          <span>Add Section</span>
+          <Pencil size={18} />
+          <span>Edit Policy</span>
         </button>
       </div>
 
-      <div className="pronimal-card p-8">
+      <div className="pronimal-card p-10">
         <div className="flex items-center gap-2 mb-8 pb-4 border-b border-gray-100">
           <FileText className="text-accent" size={24} />
-          <h2 className="text-xl font-bold text-primary">Legal Document</h2>
+          <h2 className="text-xl font-bold text-primary">Official Document</h2>
         </div>
 
-        <div className="space-y-8">
-          {sections.length > 0 ? (
-            sections.map((section) => (
-              <div key={section.id} className="relative group pb-8 last:pb-0 border-b last:border-0 border-gray-50">
-                <div className="flex justify-between items-start mb-4">
-                  <h3 className="text-lg font-bold text-primary">{section.title}</h3>
-                  <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button 
-                      onClick={() => openModal(section)}
-                      className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
-                    >
-                      <Pencil size={16} />
-                    </button>
-                    <button 
-                      onClick={() => handleDelete(section.id)}
-                      className="p-1.5 text-red-600 hover:bg-red-50 rounded-md transition-colors"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                </div>
-                <div 
-                  className="text-gray-700 leading-relaxed rich-text-content"
-                  dangerouslySetInnerHTML={{ __html: section.content }}
-                />
-              </div>
-            ))
-          ) : (
-            <div className="text-center py-12 text-gray-400">
-              No policy sections found. Click "Add Section" to create one.
-            </div>
-          )}
-        </div>
+        <div 
+          className="text-gray-700 leading-relaxed rich-text-display prose prose-slate max-w-none"
+          dangerouslySetInnerHTML={{ __html: content }}
+        />
       </div>
 
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-4xl w-full shadow-xl animate-in zoom-in-95 overflow-hidden">
+          <div className="bg-white rounded-lg max-w-5xl w-full shadow-xl animate-in zoom-in-95 overflow-hidden">
             <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
               <div className="flex items-center gap-2">
                 <Pencil className="text-accent" size={18} />
-                <h2 className="text-lg font-bold text-primary">
-                  {editingSection ? 'Section Editor' : 'New Section Editor'}
-                </h2>
+                <h2 className="text-lg font-bold text-primary">Privacy Policy Editor</h2>
               </div>
               <button onClick={closeModal} className="text-gray-400 hover:text-gray-600">
                 <X size={20} />
@@ -205,28 +129,14 @@ export default function PrivacyPolicyPage() {
             </div>
             
             <form onSubmit={handleSubmit} className="flex flex-col h-[85vh]">
-              <div className="p-6 space-y-4 overflow-y-auto flex-1">
-                <div>
-                  <label className="pronimal-label">Section Title</label>
-                  <input
-                    type="text"
-                    className="pronimal-input font-semibold"
-                    value={formData.title}
-                    onChange={(e) => setFormData({...formData, title: e.target.value})}
-                    placeholder="e.g. 1. Introduction"
-                    required
-                  />
-                </div>
-                
-                <div className="flex flex-col h-full min-h-[450px]">
-                  <label className="pronimal-label">Content Editor</label>
-                  
+              <div className="p-6 flex flex-col flex-1 overflow-hidden">
+                <div className="flex flex-col h-full">
                   <div className="border border-gray-200 rounded-t-md bg-gray-50 p-2 space-y-2">
                     <div className="flex flex-wrap items-center gap-1 pb-1.5 border-b border-gray-200">
-                      <button type="button" onClick={() => execCommand('bold')} className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><Bold size={16} /></button>
-                      <button type="button" onClick={() => execCommand('italic')} className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><Italic size={16} /></button>
-                      <button type="button" onClick={() => execCommand('underline')} className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><Underline size={16} /></button>
-                      <button type="button" onClick={() => execCommand('strikeThrough')} className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><Strikethrough size={16} /></button>
+                      <button type="button" onClick={() => execCommand('bold')} className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700" title="Bold"><Bold size={16} /></button>
+                      <button type="button" onClick={() => execCommand('italic')} className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700" title="Italic"><Italic size={16} /></button>
+                      <button type="button" onClick={() => execCommand('underline')} className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700" title="Underline"><Underline size={16} /></button>
+                      <button type="button" onClick={() => execCommand('strikeThrough')} className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700" title="Strikethrough"><Strikethrough size={16} /></button>
                       <div className="w-px h-4 bg-gray-300 mx-1" />
                       <button type="button" onClick={() => execCommand('subscript')} className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><Subscript size={16} /></button>
                       <button type="button" onClick={() => execCommand('superscript')} className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><Superscript size={16} /></button>
@@ -250,8 +160,9 @@ export default function PrivacyPolicyPage() {
                       <button type="button" onClick={() => execCommand('hiliteColor', '#ffff00')} className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><Highlighter size={16} /></button>
                     </div>
                     <div className="flex flex-wrap items-center gap-1 pb-1.5 border-b border-gray-200">
-                       <button type="button" onClick={() => execCommand('formatBlock', '<p>')} className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700 flex items-center gap-0.5"><Type size={16} /><span className="text-[10px]">P</span></button>
+                       <button type="button" onClick={() => execCommand('formatBlock', '<p>')} className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700 flex items-center gap-0.5" title="Paragraph"><Type size={16} /><span className="text-[10px]">P</span></button>
                        <button type="button" onClick={() => execCommand('formatBlock', '<h1>')} className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700 font-bold">H1</button>
+                       <button type="button" onClick={() => execCommand('formatBlock', '<h2>')} className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700 font-bold">H2</button>
                       <div className="w-px h-4 bg-gray-300 mx-1" />
                       <button type="button" onClick={() => execCommand('justifyLeft')} className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><AlignLeft size={16} /></button>
                       <button type="button" onClick={() => execCommand('justifyCenter')} className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><AlignCenter size={16} /></button>
@@ -263,12 +174,6 @@ export default function PrivacyPolicyPage() {
                       <div className="w-px h-4 bg-gray-300 mx-1" />
                       <button type="button" onClick={() => execCommand('outdent')} className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><Outdent size={16} /></button>
                       <button type="button" onClick={() => execCommand('indent')} className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><Indent size={16} /></button>
-                      <div className="w-px h-4 bg-gray-300 mx-1" />
-                      <button type="button" onClick={() => {
-                        const url = prompt('Enter the link URL:');
-                        if (url) execCommand('createLink', url);
-                      }} className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><LinkIcon size={16} /></button>
-                      <button type="button" className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><ImageIcon size={16} /></button>
                     </div>
                     <div className="flex flex-wrap items-center gap-1">
                       <button type="button" onClick={() => execCommand('undo')} className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><Undo2 size={16} /></button>
@@ -282,9 +187,8 @@ export default function PrivacyPolicyPage() {
                   <div
                     ref={editorRef}
                     contentEditable
-                    className="flex-1 w-full p-4 border border-t-0 border-gray-200 rounded-b-md font-body text-base leading-relaxed focus:outline-none focus:ring-1 focus:ring-accent/20 overflow-y-auto min-h-[300px] bg-white"
-                    dangerouslySetInnerHTML={{ __html: formData.content }}
-                    onBlur={(e) => setFormData(prev => ({ ...prev, content: e.currentTarget.innerHTML }))}
+                    className="flex-1 w-full p-8 border border-t-0 border-gray-200 rounded-b-md font-body text-base leading-relaxed focus:outline-none overflow-y-auto bg-white"
+                    dangerouslySetInnerHTML={{ __html: content }}
                   />
                 </div>
               </div>
@@ -294,13 +198,21 @@ export default function PrivacyPolicyPage() {
                   Cancel
                 </button>
                 <button type="submit" className="pronimal-btn-primary px-8 text-sm">
-                  {editingSection ? 'Update Section' : 'Publish Section'}
+                  Save Privacy Policy
                 </button>
               </div>
             </form>
           </div>
         </div>
       )}
+
+      <style jsx global>{`
+        .rich-text-display h1 { font-size: 2rem; font-weight: 800; margin-bottom: 1.5rem; color: #1f2937; }
+        .rich-text-display h2 { font-size: 1.5rem; font-weight: 700; margin-top: 2rem; margin-bottom: 1rem; color: #374151; }
+        .rich-text-display p { margin-bottom: 1rem; line-height: 1.75; }
+        .rich-text-display ul, .rich-text-display ol { margin-left: 1.5rem; margin-bottom: 1rem; }
+        .rich-text-display li { margin-bottom: 0.5rem; }
+      `}</style>
     </div>
   );
 }

@@ -77,81 +77,56 @@ export default function NewsletterPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-          <div className="pronimal-card">
-            <div className="p-4 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
-              <h2 className="font-bold text-primary flex items-center gap-2">
-                <User size={18} className="text-accent" />
-                Subscribers List
-              </h2>
-              <span className="text-xs font-medium bg-green-100 text-green-700 px-2 py-1 rounded-full">
-                {subscribers.filter(s => s.status === 'Active').length} Active
-              </span>
-            </div>
-            <table className="pronimal-table">
-              <thead>
-                <tr>
-                  <th>Email</th>
-                  <th>Joined Date</th>
-                  <th>Status</th>
-                  <th className="text-right">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {subscribers.map((sub) => (
-                  <tr key={sub.id}>
-                    <td className="font-medium">{sub.email}</td>
-                    <td>{new Date(sub.joinedAt).toLocaleDateString()}</td>
-                    <td>
-                      <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                        sub.status === 'Active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
-                      }`}>
-                        {sub.status}
-                      </span>
-                    </td>
-                    <td className="text-right">
-                      <button 
-                        onClick={() => handleDeleteSubscriber(sub.id)}
-                        className="text-red-500 hover:bg-red-50 p-2 rounded-md transition-colors"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-                {subscribers.length === 0 && (
-                  <tr>
-                    <td colSpan={4} className="text-center py-10 text-gray-400">
-                      No subscribers found.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+      <div className="pronimal-card">
+        <div className="p-4 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
+          <h2 className="font-bold text-primary flex items-center gap-2">
+            <User size={18} className="text-accent" />
+            Subscribers List
+          </h2>
+          <span className="text-xs font-medium bg-green-100 text-green-700 px-2 py-1 rounded-full">
+            {subscribers.filter(s => s.status === 'Active').length} Active
+          </span>
         </div>
-
-        <div className="space-y-6">
-          <div className="pronimal-card p-6 bg-accent/5 border-accent/10">
-            <h3 className="font-bold text-primary mb-2 flex items-center gap-2">
-              <Mail size={18} className="text-accent" />
-              Quick Stats
-            </h3>
-            <div className="space-y-4 mt-4">
-              <div>
-                <p className="text-xs text-gray-500 uppercase font-bold tracking-widest">Growth</p>
-                <p className="text-2xl font-black text-primary">+12% <span className="text-xs font-normal text-gray-400 ml-1">this month</span></p>
-              </div>
-              <div>
-                <p className="text-xs text-gray-500 uppercase font-bold tracking-widest">Active Rate</p>
-                <p className="text-2xl font-black text-primary">
-                  {subscribers.length > 0 ? ((subscribers.filter(s => s.status === 'Active').length / subscribers.length) * 100).toFixed(1) : '0'}%
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
+        <table className="pronimal-table">
+          <thead>
+            <tr>
+              <th>Email</th>
+              <th>Joined Date</th>
+              <th>Status</th>
+              <th className="text-right">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {subscribers.map((sub) => (
+              <tr key={sub.id}>
+                <td className="font-medium">{sub.email}</td>
+                <td>{new Date(sub.joinedAt).toLocaleDateString()}</td>
+                <td>
+                  <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                    sub.status === 'Active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
+                  }`}>
+                    {sub.status}
+                  </span>
+                </td>
+                <td className="text-right">
+                  <button 
+                    onClick={() => handleDeleteSubscriber(sub.id)}
+                    className="text-red-500 hover:bg-red-50 p-2 rounded-md transition-colors"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </td>
+              </tr>
+            ))}
+            {subscribers.length === 0 && (
+              <tr>
+                <td colSpan={4} className="text-center py-10 text-gray-400">
+                  No subscribers found.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
       </div>
 
       {isSubscriberModalOpen && (

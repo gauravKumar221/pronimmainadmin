@@ -1,8 +1,8 @@
 
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { Plus, Pencil, Trash2, X, Image as ImageIcon } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Plus, Pencil, Trash2, X, Image as ImageIcon, Upload } from 'lucide-react';
 import Image from 'next/image';
 
 interface BlogPost {
@@ -20,6 +20,7 @@ export default function BlogManagement() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [imageUrl, setImageUrl] = useState('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const saved = localStorage.getItem('adminix_blogs');
@@ -76,6 +77,17 @@ export default function BlogManagement() {
     if (confirm('Are you sure you want to delete this post?')) {
       const filtered = posts.filter(p => p.id !== id);
       savePosts(filtered);
+    }
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImageUrl(reader.result as string);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -201,15 +213,33 @@ export default function BlogManagement() {
                   required
                 />
               </div>
-              <div>
-                <label className="adminix-label">Image URL</label>
-                <input
-                  type="text"
-                  className="adminix-input"
-                  value={imageUrl}
-                  onChange={(e) => setImageUrl(e.target.value)}
-                  placeholder="https://images.unsplash.com/..."
-                />
+              
+              <div className="space-y-2">
+                <label className="adminix-label">Post Image</label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    className="adminix-input flex-1"
+                    value={imageUrl}
+                    onChange={(e) => setImageUrl(e.target.value)}
+                    placeholder="Image URL or upload below"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="px-3 py-2 border border-gray-300 rounded-md hover:bg-gray-50 text-gray-600"
+                    title="Upload local image"
+                  >
+                    <Upload size={20} />
+                  </button>
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    className="hidden"
+                    accept="image/*"
+                    onChange={handleFileUpload}
+                  />
+                </div>
                 {imageUrl && (
                   <div className="mt-2 relative h-32 w-full rounded-md overflow-hidden border border-gray-200">
                     <Image
@@ -221,6 +251,7 @@ export default function BlogManagement() {
                   </div>
                 )}
               </div>
+
               <div>
                 <label className="adminix-label">Description</label>
                 <textarea

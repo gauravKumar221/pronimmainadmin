@@ -1,8 +1,9 @@
 
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
+import { Upload } from 'lucide-react';
 
 interface Banner {
   id: number;
@@ -13,6 +14,7 @@ interface Banner {
 export default function BannerManagement() {
   const [banners, setBanners] = useState<Banner[]>([]);
   const [success, setSuccess] = useState('');
+  const fileInputRefs = useRef<{ [key: number]: HTMLInputElement | null }>({});
 
   useEffect(() => {
     const saved = localStorage.getItem('adminix_banners');
@@ -33,6 +35,17 @@ export default function BannerManagement() {
     setBanners(updated);
   };
 
+  const handleFileUpload = (id: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        handleUpdate(id, 'imageUrl', reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSave = () => {
     localStorage.setItem('adminix_banners', JSON.stringify(banners));
     setSuccess('Banners updated successfully!');
@@ -47,7 +60,7 @@ export default function BannerManagement() {
       </div>
 
       {success && (
-        <div className="bg-green-50 text-green-700 border border-green-200 p-4 rounded-md">
+        <div className="bg-green-50 text-green-700 border border-green-200 p-4 rounded-md animate-in fade-in slide-in-from-top-1">
           {success}
         </div>
       )}
@@ -81,13 +94,30 @@ export default function BannerManagement() {
                   />
                 </div>
                 <div>
-                  <label className="adminix-label">Image URL</label>
-                  <input
-                    type="text"
-                    className="adminix-input"
-                    value={banner.imageUrl}
-                    onChange={(e) => handleUpdate(banner.id, 'imageUrl', e.target.value)}
-                  />
+                  <label className="adminix-label">Image URL / Upload</label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      className="adminix-input flex-1"
+                      value={banner.imageUrl}
+                      onChange={(e) => handleUpdate(banner.id, 'imageUrl', e.target.value)}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => fileInputRefs.current[banner.id]?.click()}
+                      className="px-3 py-2 border border-gray-300 rounded-md hover:bg-gray-50 text-gray-600"
+                      title="Upload image"
+                    >
+                      <Upload size={20} />
+                    </button>
+                    <input
+                      type="file"
+                      ref={el => fileInputRefs.current[banner.id] = el}
+                      className="hidden"
+                      accept="image/*"
+                      onChange={(e) => handleFileUpload(banner.id, e)}
+                    />
+                  </div>
                 </div>
               </div>
             </div>

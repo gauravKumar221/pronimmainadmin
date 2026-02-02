@@ -118,37 +118,41 @@ export default function PrivacyPolicyPage() {
         </button>
       </div>
 
-      <div className="pronimal-card p-8 space-y-8">
-        {sections.length > 0 ? (
-          sections.map((section) => (
-            <div key={section.id} className="relative group border-b border-gray-50 pb-8 last:border-0 last:pb-0">
-              <div className="flex justify-between items-start mb-2">
-                <h2 className="text-lg font-bold text-primary">{section.title}</h2>
-                <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button 
-                    onClick={() => openModal(section)}
-                    className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
-                  >
-                    <Pencil size={16} />
-                  </button>
-                  <button 
-                    onClick={() => handleDelete(section.id)}
-                    className="p-1.5 text-red-600 hover:bg-red-50 rounded-md transition-colors"
-                  >
-                    <Trash2 size={16} />
-                  </button>
+      <div className="pronimal-card p-8">
+        <div className="space-y-6">
+          {sections.length > 0 ? (
+            sections.map((section) => (
+              <div key={section.id} className="relative group border-b border-gray-50 last:border-0 pb-6 last:pb-0">
+                <div className="flex justify-between items-start mb-3">
+                  <h2 className="text-lg font-bold text-primary">{section.title}</h2>
+                  <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button 
+                      onClick={() => openModal(section)}
+                      className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+                      title="Edit Section"
+                    >
+                      <Pencil size={16} />
+                    </button>
+                    <button 
+                      onClick={() => handleDelete(section.id)}
+                      className="p-1.5 text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                      title="Delete Section"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
                 </div>
+                <p className="text-gray-700 leading-relaxed">
+                  {section.content}
+                </p>
               </div>
-              <p className="text-gray-700 leading-relaxed">
-                {section.content}
-              </p>
+            ))
+          ) : (
+            <div className="text-center py-12 text-gray-400">
+              No policy sections found. Click "Add Section" to create one.
             </div>
-          ))
-        ) : (
-          <div className="text-center py-12 text-gray-400">
-            No policy sections found. Click "Add Section" to create one.
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       {isModalOpen && (

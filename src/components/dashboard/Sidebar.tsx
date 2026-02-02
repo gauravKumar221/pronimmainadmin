@@ -37,9 +37,7 @@ export default function Sidebar() {
   const router = useRouter();
 
   const handleLogout = () => {
-    // Clear auth cookie
     document.cookie = 'admin_auth=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT';
-    // Clear login time from localStorage
     localStorage.removeItem('pronimal_last_login');
     router.push('/login');
   };

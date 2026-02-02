@@ -12,6 +12,18 @@
       "description": "Hero Banner 2",
       "imageUrl": "https://picsum.photos/seed/adminix-2/1200/400",
       "imageHint": "technology abstract"
+    },
+    {
+      "id": "blog-1",
+      "description": "Blog Post 1",
+      "imageUrl": "https://picsum.photos/seed/blog-1/600/400",
+      "imageHint": "writing desk"
+    },
+    {
+      "id": "blog-2",
+      "description": "Blog Post 2",
+      "imageUrl": "https://picsum.photos/seed/blog-2/600/400",
+      "imageHint": "office meeting"
     }
   ]
 }

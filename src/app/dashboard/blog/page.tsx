@@ -2,12 +2,14 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Plus, Pencil, Trash2, X } from 'lucide-react';
+import { Plus, Pencil, Trash2, X, Image as ImageIcon } from 'lucide-react';
+import Image from 'next/image';
 
 interface BlogPost {
   id: string;
   title: string;
   description: string;
+  imageUrl: string;
   createdAt: string;
 }
 
@@ -17,15 +19,28 @@ export default function BlogManagement() {
   const [editingPost, setEditingPost] = useState<BlogPost | null>(null);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [imageUrl, setImageUrl] = useState('');
 
   useEffect(() => {
     const saved = localStorage.getItem('adminix_blogs');
     if (saved) {
       setPosts(JSON.parse(saved));
     } else {
-      const initialPosts = [
-        { id: '1', title: 'Welcome to Adminix', description: 'This is your first admin post.', createdAt: new Date().toISOString() },
-        { id: '2', title: 'Admin Tips & Tricks', description: 'How to use the dashboard effectively.', createdAt: new Date().toISOString() },
+      const initialPosts: BlogPost[] = [
+        { 
+          id: '1', 
+          title: 'Welcome to Adminix', 
+          description: 'This is your first admin post.', 
+          imageUrl: 'https://picsum.photos/seed/blog-1/600/400',
+          createdAt: new Date().toISOString() 
+        },
+        { 
+          id: '2', 
+          title: 'Admin Tips & Tricks', 
+          description: 'How to use the dashboard effectively.', 
+          imageUrl: 'https://picsum.photos/seed/blog-2/600/400',
+          createdAt: new Date().toISOString() 
+        },
       ];
       setPosts(initialPosts);
       localStorage.setItem('adminix_blogs', JSON.stringify(initialPosts));
@@ -41,7 +56,7 @@ export default function BlogManagement() {
     e.preventDefault();
     if (editingPost) {
       const updated = posts.map(p => 
-        p.id === editingPost.id ? { ...p, title, description } : p
+        p.id === editingPost.id ? { ...p, title, description, imageUrl } : p
       );
       savePosts(updated);
     } else {
@@ -49,6 +64,7 @@ export default function BlogManagement() {
         id: Math.random().toString(36).substr(2, 9),
         title,
         description,
+        imageUrl: imageUrl || 'https://picsum.photos/seed/default/600/400',
         createdAt: new Date().toISOString(),
       };
       savePosts([newPost, ...posts]);
@@ -68,10 +84,12 @@ export default function BlogManagement() {
       setEditingPost(post);
       setTitle(post.title);
       setDescription(post.description);
+      setImageUrl(post.imageUrl);
     } else {
       setEditingPost(null);
       setTitle('');
       setDescription('');
+      setImageUrl('');
     }
     setIsModalOpen(true);
   };
@@ -81,6 +99,7 @@ export default function BlogManagement() {
     setEditingPost(null);
     setTitle('');
     setDescription('');
+    setImageUrl('');
   };
 
   return (
@@ -103,6 +122,7 @@ export default function BlogManagement() {
         <table className="adminix-table">
           <thead>
             <tr>
+              <th className="w-24">Image</th>
               <th>Title</th>
               <th>Description</th>
               <th>Date</th>
@@ -113,6 +133,22 @@ export default function BlogManagement() {
             {posts.length > 0 ? (
               posts.map((post) => (
                 <tr key={post.id}>
+                  <td>
+                    <div className="relative w-16 h-12 rounded bg-gray-100 overflow-hidden border border-gray-100">
+                      {post.imageUrl ? (
+                        <Image
+                          src={post.imageUrl}
+                          alt={post.title}
+                          fill
+                          className="object-cover"
+                        />
+                      ) : (
+                        <div className="flex items-center justify-center h-full text-gray-400">
+                          <ImageIcon size={16} />
+                        </div>
+                      )}
+                    </div>
+                  </td>
                   <td className="font-semibold">{post.title}</td>
                   <td className="max-w-xs truncate">{post.description}</td>
                   <td>{new Date(post.createdAt).toLocaleDateString()}</td>
@@ -134,7 +170,7 @@ export default function BlogManagement() {
               ))
             ) : (
               <tr>
-                <td colSpan={4} className="text-center py-8 text-gray-400">
+                <td colSpan={5} className="text-center py-8 text-gray-400">
                   No blog posts found.
                 </td>
               </tr>
@@ -164,6 +200,26 @@ export default function BlogManagement() {
                   onChange={(e) => setTitle(e.target.value)}
                   required
                 />
+              </div>
+              <div>
+                <label className="adminix-label">Image URL</label>
+                <input
+                  type="text"
+                  className="adminix-input"
+                  value={imageUrl}
+                  onChange={(e) => setImageUrl(e.target.value)}
+                  placeholder="https://images.unsplash.com/..."
+                />
+                {imageUrl && (
+                  <div className="mt-2 relative h-32 w-full rounded-md overflow-hidden border border-gray-200">
+                    <Image
+                      src={imageUrl}
+                      alt="Preview"
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                )}
               </div>
               <div>
                 <label className="adminix-label">Description</label>

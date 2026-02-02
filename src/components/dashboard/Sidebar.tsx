@@ -1,4 +1,3 @@
-
 'use client';
 
 import React from 'react';
@@ -17,7 +16,6 @@ import {
   FileCheck,
   LogOut,
   Mail,
-  PhoneCall,
   MessageSquare
 } from 'lucide-react';
 
@@ -30,7 +28,6 @@ const navItems = [
   { name: 'Owners', href: '/dashboard/owner', icon: Contact },
   { name: 'Newsletter', href: '/dashboard/newsletter', icon: Mail },
   { name: 'Inquiries', href: '/dashboard/contact', icon: MessageSquare },
-  { name: 'Contact Info', href: '/dashboard/contact-info', icon: PhoneCall },
   { name: 'About Us', href: '/dashboard/about', icon: Info },
   { name: 'FAQs', href: '/dashboard/faqs', icon: HelpCircle },
   { name: 'Privacy Policy', href: '/dashboard/privacy', icon: ShieldCheck },

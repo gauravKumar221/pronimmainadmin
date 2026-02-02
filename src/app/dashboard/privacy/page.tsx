@@ -1,7 +1,41 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Plus, Pencil, Trash2, X, FileText } from 'lucide-react';
+import { 
+  Plus, 
+  Pencil, 
+  Trash2, 
+  X, 
+  FileText,
+  Bold,
+  Italic,
+  Underline,
+  Strikethrough,
+  Subscript,
+  Superscript,
+  ChevronDown,
+  Highlighter,
+  Type,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  AlignJustify,
+  ListOrdered,
+  List,
+  Outdent,
+  Indent,
+  Link as LinkIcon,
+  Image as ImageIcon,
+  Video,
+  Volume2,
+  Table,
+  Eraser,
+  Printer,
+  Code,
+  Maximize2,
+  Undo2,
+  Redo2
+} from 'lucide-react';
 
 interface PrivacySection {
   id: string;
@@ -162,58 +196,118 @@ export default function PrivacyPolicyPage() {
 
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-2xl w-full shadow-xl animate-in zoom-in-95">
-            <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50 rounded-t-lg">
+          <div className="bg-white rounded-lg max-w-4xl w-full shadow-xl animate-in zoom-in-95 overflow-hidden">
+            <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
               <div className="flex items-center gap-2">
-                <Pencil className="text-accent" size={20} />
-                <h2 className="text-xl font-bold text-primary">
+                <Pencil className="text-accent" size={18} />
+                <h2 className="text-lg font-bold text-primary">
                   {editingSection ? 'Section Editor' : 'New Section Editor'}
                 </h2>
               </div>
               <button onClick={closeModal} className="text-gray-400 hover:text-gray-600 transition-colors">
-                <X size={24} />
+                <X size={20} />
               </button>
             </div>
-            <form onSubmit={handleSubmit} className="p-6 space-y-6">
-              <div>
-                <label className="pronimal-label">Section Title</label>
-                <input
-                  type="text"
-                  className="pronimal-input font-semibold"
-                  value={formData.title}
-                  onChange={(e) => setFormData({...formData, title: e.target.value})}
-                  placeholder="e.g. 1. Introduction"
-                  required
-                />
-              </div>
-              <div>
-                <label className="pronimal-label">Content Editor</label>
-                <div className="relative group">
-                  <textarea
-                    className="pronimal-input min-h-[300px] font-body text-base leading-relaxed resize-y focus:ring-accent"
-                    value={formData.content}
-                    onChange={(e) => setFormData({...formData, content: e.target.value})}
-                    placeholder="Type your policy content here..."
+            
+            <form onSubmit={handleSubmit} className="flex flex-col h-[80vh]">
+              <div className="p-6 space-y-4 overflow-y-auto flex-1">
+                <div>
+                  <label className="pronimal-label">Section Title</label>
+                  <input
+                    type="text"
+                    className="pronimal-input font-semibold"
+                    value={formData.title}
+                    onChange={(e) => setFormData({...formData, title: e.target.value})}
+                    placeholder="e.g. 1. Introduction"
                     required
                   />
-                  <div className="absolute bottom-3 right-3 text-xs text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">
-                    Markdown not supported (Plain Text)
+                </div>
+                
+                <div className="flex flex-col h-full min-h-[400px]">
+                  <label className="pronimal-label">Content Editor</label>
+                  
+                  {/* Advanced Toolbar UI */}
+                  <div className="border border-gray-200 rounded-t-md bg-gray-50 p-2 space-y-2">
+                    {/* Row 1 */}
+                    <div className="flex flex-wrap items-center gap-1 pb-1.5 border-b border-gray-200">
+                      <button type="button" className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><Bold size={16} /></button>
+                      <button type="button" className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><Italic size={16} /></button>
+                      <button type="button" className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><Underline size={16} /></button>
+                      <button type="button" className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><Strikethrough size={16} /></button>
+                      <div className="w-px h-4 bg-gray-300 mx-1" />
+                      <button type="button" className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><Subscript size={16} /></button>
+                      <button type="button" className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><Superscript size={16} /></button>
+                      <div className="w-px h-4 bg-gray-300 mx-1" />
+                      <div className="flex items-center gap-1 px-2 py-1 bg-white border border-gray-300 rounded text-xs text-gray-700 cursor-default">
+                        Segoe UI <ChevronDown size={12} />
+                      </div>
+                      <div className="flex items-center gap-1 px-2 py-1 bg-white border border-gray-300 rounded text-xs text-gray-700 cursor-default">
+                        12pt <ChevronDown size={12} />
+                      </div>
+                      <div className="w-px h-4 bg-gray-300 mx-1" />
+                      <button type="button" className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-red-600 font-bold text-xs underline decoration-2">A</button>
+                      <button type="button" className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><Highlighter size={16} /></button>
+                    </div>
+                    {/* Row 2 */}
+                    <div className="flex flex-wrap items-center gap-1 pb-1.5 border-b border-gray-200">
+                       <button type="button" className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700 flex items-center gap-0.5"><Type size={16} /><span className="text-[10px]">t</span></button>
+                       <div className="flex items-center gap-1 px-2 py-1 bg-white border border-gray-300 rounded text-xs text-gray-700 cursor-default">
+                        Paragraph <ChevronDown size={12} />
+                      </div>
+                      <div className="w-px h-4 bg-gray-300 mx-1" />
+                      <button type="button" className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><AlignLeft size={16} /></button>
+                      <button type="button" className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><AlignCenter size={16} /></button>
+                      <button type="button" className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><AlignRight size={16} /></button>
+                      <button type="button" className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><AlignJustify size={16} /></button>
+                      <div className="w-px h-4 bg-gray-300 mx-1" />
+                      <button type="button" className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><ListOrdered size={16} /></button>
+                      <button type="button" className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><List size={16} /></button>
+                      <div className="w-px h-4 bg-gray-300 mx-1" />
+                      <button type="button" className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><Outdent size={16} /></button>
+                      <button type="button" className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><Indent size={16} /></button>
+                      <div className="w-px h-4 bg-gray-300 mx-1" />
+                      <button type="button" className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><LinkIcon size={16} /></button>
+                      <button type="button" className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><ImageIcon size={16} /></button>
+                      <button type="button" className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><Video size={16} /></button>
+                    </div>
+                    {/* Row 3 */}
+                    <div className="flex flex-wrap items-center gap-1">
+                      <button type="button" className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><Volume2 size={16} /></button>
+                      <button type="button" className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><Table size={16} /></button>
+                      <div className="w-px h-4 bg-gray-300 mx-1" />
+                      <button type="button" className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><Eraser size={16} /></button>
+                      <button type="button" className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><Printer size={16} /></button>
+                      <button type="button" className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><Code size={16} /></button>
+                      <button type="button" className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><Maximize2 size={16} /></button>
+                      <div className="w-px h-4 bg-gray-300 mx-1" />
+                      <button type="button" className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><Undo2 size={16} /></button>
+                      <button type="button" className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><Redo2 size={16} /></button>
+                    </div>
                   </div>
+
+                  <textarea
+                    className="flex-1 w-full p-4 border border-t-0 border-gray-200 rounded-b-md font-body text-base leading-relaxed focus:outline-none focus:ring-1 focus:ring-accent/20 resize-none min-h-[300px]"
+                    value={formData.content}
+                    onChange={(e) => setFormData({...formData, content: e.target.value})}
+                    placeholder="Start typing your policy section content here..."
+                    required
+                  />
                 </div>
               </div>
-              <div className="pt-4 flex gap-3 justify-end border-t border-gray-100">
+
+              <div className="p-4 flex gap-3 justify-end border-t border-gray-100 bg-gray-50/50">
                 <button 
                   type="button" 
                   onClick={closeModal} 
-                  className="px-6 py-2.5 text-gray-600 font-medium hover:bg-gray-100 rounded-md transition-colors"
+                  className="px-6 py-2 text-gray-600 font-medium hover:bg-gray-100 rounded-md transition-colors text-sm"
                 >
                   Cancel
                 </button>
                 <button 
                   type="submit" 
-                  className="pronimal-btn-primary px-8"
+                  className="pronimal-btn-primary px-8 text-sm"
                 >
-                  {editingSection ? 'Save Changes' : 'Publish Section'}
+                  {editingSection ? 'Update Section' : 'Publish Section'}
                 </button>
               </div>
             </form>

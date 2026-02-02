@@ -1,3 +1,4 @@
+
 'use client';
 
 import React from 'react';
@@ -28,14 +29,14 @@ export default function Sidebar() {
     // Clear auth cookie
     document.cookie = 'admin_auth=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT';
     // Clear login time from localStorage
-    localStorage.removeItem('admin_last_login');
+    localStorage.removeItem('pronimal_last_login');
     router.push('/login');
   };
 
   return (
     <aside className="w-64 bg-primary text-white flex flex-col h-screen sticky top-0">
       <div className="p-6">
-        <h1 className="text-2xl font-bold tracking-tight">Adminix</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Pronim.al</h1>
       </div>
 
       <nav className="flex-1 px-4 space-y-1">

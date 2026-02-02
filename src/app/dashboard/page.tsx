@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -7,8 +8,7 @@ export default function DashboardPage() {
   const [loginTime, setLoginTime] = useState<string | null>(null);
 
   useEffect(() => {
-    // Safely access localStorage after hydration
-    const storedTime = localStorage.getItem('admin_last_login');
+    const storedTime = localStorage.getItem('pronimal_last_login');
     if (storedTime) {
       setLoginTime(new Date(storedTime).toLocaleString());
     }
@@ -25,7 +25,7 @@ export default function DashboardPage() {
     <div className="space-y-8">
       <div className="flex justify-between items-end">
         <div>
-          <h1 className="text-2xl font-bold text-primary">Dashboard Overview</h1>
+          <h1 className="text-2xl font-bold text-primary">Pronim.al Overview</h1>
           <p className="text-gray-500">Welcome back, Admin!</p>
         </div>
         {loginTime && (
@@ -38,7 +38,7 @@ export default function DashboardPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat) => (
-          <div key={stat.name} className="adminix-card p-6 flex items-center gap-4">
+          <div key={stat.name} className="pronimal-card p-6 flex items-center gap-4">
             <div className={`${stat.bg} ${stat.color} p-3 rounded-lg`}>
               <stat.icon size={24} />
             </div>
@@ -51,7 +51,7 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="adminix-card">
+        <div className="pronimal-card">
           <div className="p-6 border-b border-gray-100 flex justify-between items-center">
             <h2 className="font-semibold text-lg">Recent Activities</h2>
             <button className="text-accent text-sm font-medium">View All</button>
@@ -69,13 +69,13 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <div className="adminix-card">
+        <div className="pronimal-card">
           <div className="p-6 border-b border-gray-100">
             <h2 className="font-semibold text-lg">Quick Access</h2>
           </div>
           <div className="p-6 grid grid-cols-2 gap-4">
-            <button className="adminix-btn-primary text-sm">Create New Blog Post</button>
-            <button className="adminix-btn-accent text-sm">Manage Banners</button>
+            <button className="pronimal-btn-primary text-sm">Create New Blog Post</button>
+            <button className="pronimal-btn-accent text-sm">Manage Banners</button>
             <button className="border border-gray-200 text-gray-600 px-4 py-2 rounded-md hover:bg-gray-50 transition-colors text-sm font-medium">System Settings</button>
             <button className="border border-gray-200 text-gray-600 px-4 py-2 rounded-md hover:bg-gray-50 transition-colors text-sm font-medium">User Reports</button>
           </div>

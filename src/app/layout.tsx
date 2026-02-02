@@ -1,8 +1,9 @@
+
 import type {Metadata} from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Adminix - Admin Dashboard',
+  title: 'Pronim.al - Admin Dashboard',
   description: 'Professional admin dashboard for blog and agency management.',
 };
 

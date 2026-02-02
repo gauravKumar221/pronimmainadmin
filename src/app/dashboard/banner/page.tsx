@@ -21,22 +21,22 @@ export default function BannerManagement() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    const saved = localStorage.getItem('adminix_banners');
+    const saved = localStorage.getItem('pronimal_banners');
     if (saved) {
       setBanners(JSON.parse(saved));
     } else {
       const initial = [
-        { id: '1', title: 'Summer Collection Sale', imageUrl: 'https://picsum.photos/seed/adminix-1/1200/400' },
-        { id: '2', title: 'New Arrival Technology', imageUrl: 'https://picsum.photos/seed/adminix-2/1200/400' },
+        { id: '1', title: 'Summer Collection Sale', imageUrl: 'https://picsum.photos/seed/pronimal-1/1200/400' },
+        { id: '2', title: 'New Arrival Technology', imageUrl: 'https://picsum.photos/seed/pronimal-2/1200/400' },
       ];
       setBanners(initial);
-      localStorage.setItem('adminix_banners', JSON.stringify(initial));
+      localStorage.setItem('pronimal_banners', JSON.stringify(initial));
     }
   }, []);
 
   const saveBanners = (updatedBanners: Banner[]) => {
     setBanners(updatedBanners);
-    localStorage.setItem('adminix_banners', JSON.stringify(updatedBanners));
+    localStorage.setItem('pronimal_banners', JSON.stringify(updatedBanners));
   };
 
   const openModal = (banner?: Banner) => {
@@ -107,7 +107,7 @@ export default function BannerManagement() {
         </div>
         <button 
           onClick={() => openModal()}
-          className="adminix-btn-accent flex items-center gap-2"
+          className="pronimal-btn-accent flex items-center gap-2"
         >
           <Plus size={18} />
           <span>Add Banner</span>
@@ -123,7 +123,7 @@ export default function BannerManagement() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {banners.length > 0 ? (
           banners.map((banner) => (
-            <div key={banner.id} className="adminix-card group relative">
+            <div key={banner.id} className="pronimal-card group relative">
               <div className="relative h-48 bg-gray-100 overflow-hidden border-b border-gray-100">
                 {banner.imageUrl ? (
                   <Image
@@ -180,10 +180,10 @@ export default function BannerManagement() {
             </div>
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <div>
-                <label className="adminix-label">Banner Title</label>
+                <label className="pronimal-label">Banner Title</label>
                 <input
                   type="text"
-                  className="adminix-input"
+                  className="pronimal-input"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="e.g. Summer Collection Sale"
@@ -192,11 +192,11 @@ export default function BannerManagement() {
               </div>
               
               <div className="space-y-2">
-                <label className="adminix-label">Banner Image</label>
+                <label className="pronimal-label">Banner Image</label>
                 <div className="flex gap-2">
                   <input
                     type="text"
-                    className="adminix-input flex-1"
+                    className="pronimal-input flex-1"
                     value={imageUrl}
                     onChange={(e) => setImageUrl(e.target.value)}
                     placeholder="Image URL or upload below"
@@ -233,7 +233,7 @@ export default function BannerManagement() {
                 <button type="button" onClick={closeModal} className="px-4 py-2 text-gray-600 font-medium">
                   Cancel
                 </button>
-                <button type="submit" className="adminix-btn-primary">
+                <button type="submit" className="pronimal-btn-primary">
                   {editingBanner ? 'Update Banner' : 'Create Banner'}
                 </button>
               </div>

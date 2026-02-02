@@ -23,14 +23,14 @@ export default function BlogManagement() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    const saved = localStorage.getItem('adminix_blogs');
+    const saved = localStorage.getItem('pronimal_blogs');
     if (saved) {
       setPosts(JSON.parse(saved));
     } else {
       const initialPosts: BlogPost[] = [
         { 
           id: '1', 
-          title: 'Welcome to Adminix', 
+          title: 'Welcome to Pronim.al', 
           description: 'This is your first admin post.', 
           imageUrl: 'https://picsum.photos/seed/blog-1/600/400',
           createdAt: new Date().toISOString() 
@@ -44,13 +44,13 @@ export default function BlogManagement() {
         },
       ];
       setPosts(initialPosts);
-      localStorage.setItem('adminix_blogs', JSON.stringify(initialPosts));
+      localStorage.setItem('pronimal_blogs', JSON.stringify(initialPosts));
     }
   }, []);
 
   const savePosts = (newPosts: BlogPost[]) => {
     setPosts(newPosts);
-    localStorage.setItem('adminix_blogs', JSON.stringify(newPosts));
+    localStorage.setItem('pronimal_blogs', JSON.stringify(newPosts));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -123,15 +123,15 @@ export default function BlogManagement() {
         </div>
         <button 
           onClick={() => openModal()}
-          className="adminix-btn-accent flex items-center gap-2"
+          className="pronimal-btn-accent flex items-center gap-2"
         >
           <Plus size={18} />
           <span>New Post</span>
         </button>
       </div>
 
-      <div className="adminix-card">
-        <table className="adminix-table">
+      <div className="pronimal-card">
+        <table className="pronimal-table">
           <thead>
             <tr>
               <th className="w-24">Image</th>
@@ -204,10 +204,10 @@ export default function BlogManagement() {
             </div>
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <div>
-                <label className="adminix-label">Title</label>
+                <label className="pronimal-label">Title</label>
                 <input
                   type="text"
-                  className="adminix-input"
+                  className="pronimal-input"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   required
@@ -215,11 +215,11 @@ export default function BlogManagement() {
               </div>
               
               <div className="space-y-2">
-                <label className="adminix-label">Post Image</label>
+                <label className="pronimal-label">Post Image</label>
                 <div className="flex gap-2">
                   <input
                     type="text"
-                    className="adminix-input flex-1"
+                    className="pronimal-input flex-1"
                     value={imageUrl}
                     onChange={(e) => setImageUrl(e.target.value)}
                     placeholder="Image URL or upload below"
@@ -253,9 +253,9 @@ export default function BlogManagement() {
               </div>
 
               <div>
-                <label className="adminix-label">Description</label>
+                <label className="pronimal-label">Description</label>
                 <textarea
-                  className="adminix-input min-h-[120px]"
+                  className="pronimal-input min-h-[120px]"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   required
@@ -265,7 +265,7 @@ export default function BlogManagement() {
                 <button type="button" onClick={closeModal} className="px-4 py-2 text-gray-600 font-medium">
                   Cancel
                 </button>
-                <button type="submit" className="adminix-btn-primary">
+                <button type="submit" className="pronimal-btn-primary">
                   {editingPost ? 'Update Post' : 'Publish Post'}
                 </button>
               </div>

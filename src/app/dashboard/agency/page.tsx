@@ -25,8 +25,8 @@ export default function AgencyPage() {
         </div>
       </div>
 
-      <div className="adminix-card">
-        <table className="adminix-table">
+      <div className="pronimal-card">
+        <table className="pronimal-table">
           <thead>
             <tr>
               <th>Agency Name</th>

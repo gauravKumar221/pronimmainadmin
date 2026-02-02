@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState } from 'react';
@@ -17,12 +18,10 @@ export default function LoginPage() {
     setError('');
 
     try {
-      // Call the server action to verify credentials securely
       const result = await loginAction(identifier, password);
 
       if (result.success) {
-        // Store the login time in localStorage
-        localStorage.setItem('admin_last_login', new Date().toISOString());
+        localStorage.setItem('pronimal_last_login', new Date().toISOString());
         router.push('/dashboard');
       } else {
         setError(result.error || 'Invalid login attempt');
@@ -36,9 +35,9 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <div className="max-w-md w-full adminix-card p-8">
+      <div className="max-w-md w-full pronimal-card p-8">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-primary mb-2">Adminix</h1>
+          <h1 className="text-3xl font-bold text-primary mb-2">Pronim.al</h1>
           <p className="text-gray-500">Sign in to your admin dashboard</p>
         </div>
 
@@ -50,13 +49,13 @@ export default function LoginPage() {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="adminix-label" htmlFor="identifier">
+            <label className="pronimal-label" htmlFor="identifier">
               Username or Email
             </label>
             <input
               id="identifier"
               type="text"
-              className="adminix-input"
+              className="pronimal-input"
               placeholder="Username or Email"
               value={identifier}
               onChange={(e) => setIdentifier(e.target.value)}
@@ -65,13 +64,13 @@ export default function LoginPage() {
           </div>
 
           <div>
-            <label className="adminix-label" htmlFor="password">
+            <label className="pronimal-label" htmlFor="password">
               Password
             </label>
             <input
               id="password"
               type="password"
-              className="adminix-input"
+              className="pronimal-input"
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -82,14 +81,14 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full adminix-btn-primary py-3"
+            className="w-full pronimal-btn-primary py-3"
           >
             {isLoading ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
 
         <div className="mt-8 text-center text-xs text-gray-400">
-          <p>Credentials are now managed via environment variables.</p>
+          <p>Credentials are managed via environment variables.</p>
         </div>
       </div>
     </div>

@@ -23,7 +23,7 @@
   --radius: 0.5rem;
 
   /* Sidebar Theme */
-  --sidebar-background: 0 0% 35%; /* Dark Gray */
+  --sidebar-background: 0 0% 35%; /* Dark Gray #595959 */
   --sidebar-foreground: 0 0% 100%;
   --sidebar-primary: 2 100% 54%; /* Red */
   --sidebar-primary-foreground: 0 0% 100%;

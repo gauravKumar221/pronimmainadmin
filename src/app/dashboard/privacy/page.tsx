@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Plus, 
   Pencil, 
@@ -51,6 +51,8 @@ export default function PrivacyPolicyPage() {
     title: '',
     content: '',
   });
+  
+  const editorRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const saved = localStorage.getItem('pronimal_privacy');
@@ -67,21 +69,6 @@ export default function PrivacyPolicyPage() {
           id: '2',
           title: "2. Information We Collect",
           content: "We collect personal information that you voluntarily provide to us when registering at the Services, expressing an interest in obtaining information about us or our products and services, or otherwise contacting us."
-        },
-        {
-          id: '3',
-          title: "3. How We Use Your Information",
-          content: "We use personal information collected via our Services for a variety of business purposes described below. We process your personal information for these purposes in reliance on our legitimate business interests, in order to enter into or perform a contract with you, with your consent, and/or for compliance with our legal obligations."
-        },
-        {
-          id: '4',
-          title: "4. Sharing Your Information",
-          content: "We only share information with your consent, to comply with laws, to provide you with services, to protect your rights, or to fulfill business obligations."
-        },
-        {
-          id: '5',
-          title: "5. Data Security",
-          content: "We aim to protect your personal information through a system of organizational and technical security measures."
         }
       ];
       setSections(initial);
@@ -116,13 +103,15 @@ export default function PrivacyPolicyPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const finalContent = editorRef.current?.innerHTML || formData.content;
     let updated;
     if (editingSection) {
-      updated = sections.map(s => s.id === editingSection.id ? { ...s, ...formData } : s);
+      updated = sections.map(s => s.id === editingSection.id ? { ...s, title: formData.title, content: finalContent } : s);
     } else {
       const newSection = {
         id: Math.random().toString(36).substr(2, 9),
-        ...formData,
+        title: formData.title,
+        content: finalContent,
       };
       updated = [...sections, newSection];
     }
@@ -133,6 +122,13 @@ export default function PrivacyPolicyPage() {
   const handleDelete = (id: string) => {
     if (confirm('Are you sure you want to delete this privacy policy section?')) {
       saveSections(sections.filter(s => s.id !== id));
+    }
+  };
+
+  const execCommand = (command: string, value?: string) => {
+    document.execCommand(command, false, value);
+    if (editorRef.current) {
+      setFormData(prev => ({ ...prev, content: editorRef.current?.innerHTML || '' }));
     }
   };
 
@@ -168,22 +164,21 @@ export default function PrivacyPolicyPage() {
                     <button 
                       onClick={() => openModal(section)}
                       className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
-                      title="Edit Section"
                     >
                       <Pencil size={16} />
                     </button>
                     <button 
                       onClick={() => handleDelete(section.id)}
                       className="p-1.5 text-red-600 hover:bg-red-50 rounded-md transition-colors"
-                      title="Delete Section"
                     >
                       <Trash2 size={16} />
                     </button>
                   </div>
                 </div>
-                <div className="text-gray-700 leading-relaxed whitespace-pre-wrap">
-                  {section.content}
-                </div>
+                <div 
+                  className="text-gray-700 leading-relaxed rich-text-content"
+                  dangerouslySetInnerHTML={{ __html: section.content }}
+                />
               </div>
             ))
           ) : (
@@ -204,12 +199,12 @@ export default function PrivacyPolicyPage() {
                   {editingSection ? 'Section Editor' : 'New Section Editor'}
                 </h2>
               </div>
-              <button onClick={closeModal} className="text-gray-400 hover:text-gray-600 transition-colors">
+              <button onClick={closeModal} className="text-gray-400 hover:text-gray-600">
                 <X size={20} />
               </button>
             </div>
             
-            <form onSubmit={handleSubmit} className="flex flex-col h-[80vh]">
+            <form onSubmit={handleSubmit} className="flex flex-col h-[85vh]">
               <div className="p-6 space-y-4 overflow-y-auto flex-1">
                 <div>
                   <label className="pronimal-label">Section Title</label>
@@ -223,90 +218,82 @@ export default function PrivacyPolicyPage() {
                   />
                 </div>
                 
-                <div className="flex flex-col h-full min-h-[400px]">
+                <div className="flex flex-col h-full min-h-[450px]">
                   <label className="pronimal-label">Content Editor</label>
                   
-                  {/* Advanced Toolbar UI */}
                   <div className="border border-gray-200 rounded-t-md bg-gray-50 p-2 space-y-2">
-                    {/* Row 1 */}
                     <div className="flex flex-wrap items-center gap-1 pb-1.5 border-b border-gray-200">
-                      <button type="button" className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><Bold size={16} /></button>
-                      <button type="button" className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><Italic size={16} /></button>
-                      <button type="button" className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><Underline size={16} /></button>
-                      <button type="button" className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><Strikethrough size={16} /></button>
+                      <button type="button" onClick={() => execCommand('bold')} className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><Bold size={16} /></button>
+                      <button type="button" onClick={() => execCommand('italic')} className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><Italic size={16} /></button>
+                      <button type="button" onClick={() => execCommand('underline')} className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><Underline size={16} /></button>
+                      <button type="button" onClick={() => execCommand('strikeThrough')} className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><Strikethrough size={16} /></button>
                       <div className="w-px h-4 bg-gray-300 mx-1" />
-                      <button type="button" className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><Subscript size={16} /></button>
-                      <button type="button" className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><Superscript size={16} /></button>
+                      <button type="button" onClick={() => execCommand('subscript')} className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><Subscript size={16} /></button>
+                      <button type="button" onClick={() => execCommand('superscript')} className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><Superscript size={16} /></button>
                       <div className="w-px h-4 bg-gray-300 mx-1" />
-                      <div className="flex items-center gap-1 px-2 py-1 bg-white border border-gray-300 rounded text-xs text-gray-700 cursor-default">
-                        Segoe UI <ChevronDown size={12} />
-                      </div>
-                      <div className="flex items-center gap-1 px-2 py-1 bg-white border border-gray-300 rounded text-xs text-gray-700 cursor-default">
-                        12pt <ChevronDown size={12} />
-                      </div>
+                      <select className="bg-white border border-gray-300 rounded text-xs px-2 py-1 outline-none focus:ring-1 focus:ring-accent" onChange={(e) => execCommand('fontName', e.target.value)}>
+                        <option value="Inter">Inter</option>
+                        <option value="Arial">Arial</option>
+                        <option value="Times New Roman">Times</option>
+                        <option value="Courier New">Courier</option>
+                      </select>
+                      <select className="bg-white border border-gray-300 rounded text-xs px-2 py-1 outline-none focus:ring-1 focus:ring-accent" onChange={(e) => execCommand('fontSize', e.target.value)}>
+                        <option value="3">12pt</option>
+                        <option value="1">8pt</option>
+                        <option value="2">10pt</option>
+                        <option value="4">14pt</option>
+                        <option value="5">18pt</option>
+                        <option value="6">24pt</option>
+                      </select>
                       <div className="w-px h-4 bg-gray-300 mx-1" />
-                      <button type="button" className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-red-600 font-bold text-xs underline decoration-2">A</button>
-                      <button type="button" className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><Highlighter size={16} /></button>
+                      <input type="color" className="w-6 h-6 p-0 border-0 bg-transparent cursor-pointer" onChange={(e) => execCommand('foreColor', e.target.value)} />
+                      <button type="button" onClick={() => execCommand('hiliteColor', '#ffff00')} className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><Highlighter size={16} /></button>
                     </div>
-                    {/* Row 2 */}
                     <div className="flex flex-wrap items-center gap-1 pb-1.5 border-b border-gray-200">
-                       <button type="button" className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700 flex items-center gap-0.5"><Type size={16} /><span className="text-[10px]">t</span></button>
-                       <div className="flex items-center gap-1 px-2 py-1 bg-white border border-gray-300 rounded text-xs text-gray-700 cursor-default">
-                        Paragraph <ChevronDown size={12} />
-                      </div>
+                       <button type="button" onClick={() => execCommand('formatBlock', '<p>')} className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700 flex items-center gap-0.5"><Type size={16} /><span className="text-[10px]">P</span></button>
+                       <button type="button" onClick={() => execCommand('formatBlock', '<h1>')} className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700 font-bold">H1</button>
                       <div className="w-px h-4 bg-gray-300 mx-1" />
-                      <button type="button" className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><AlignLeft size={16} /></button>
-                      <button type="button" className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><AlignCenter size={16} /></button>
-                      <button type="button" className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><AlignRight size={16} /></button>
-                      <button type="button" className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><AlignJustify size={16} /></button>
+                      <button type="button" onClick={() => execCommand('justifyLeft')} className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><AlignLeft size={16} /></button>
+                      <button type="button" onClick={() => execCommand('justifyCenter')} className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><AlignCenter size={16} /></button>
+                      <button type="button" onClick={() => execCommand('justifyRight')} className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><AlignRight size={16} /></button>
+                      <button type="button" onClick={() => execCommand('justifyFull')} className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><AlignJustify size={16} /></button>
                       <div className="w-px h-4 bg-gray-300 mx-1" />
-                      <button type="button" className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><ListOrdered size={16} /></button>
-                      <button type="button" className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><List size={16} /></button>
+                      <button type="button" onClick={() => execCommand('insertOrderedList')} className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><ListOrdered size={16} /></button>
+                      <button type="button" onClick={() => execCommand('insertUnorderedList')} className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><List size={16} /></button>
                       <div className="w-px h-4 bg-gray-300 mx-1" />
-                      <button type="button" className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><Outdent size={16} /></button>
-                      <button type="button" className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><Indent size={16} /></button>
+                      <button type="button" onClick={() => execCommand('outdent')} className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><Outdent size={16} /></button>
+                      <button type="button" onClick={() => execCommand('indent')} className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><Indent size={16} /></button>
                       <div className="w-px h-4 bg-gray-300 mx-1" />
-                      <button type="button" className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><LinkIcon size={16} /></button>
+                      <button type="button" onClick={() => {
+                        const url = prompt('Enter the link URL:');
+                        if (url) execCommand('createLink', url);
+                      }} className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><LinkIcon size={16} /></button>
                       <button type="button" className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><ImageIcon size={16} /></button>
-                      <button type="button" className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><Video size={16} /></button>
                     </div>
-                    {/* Row 3 */}
                     <div className="flex flex-wrap items-center gap-1">
-                      <button type="button" className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><Volume2 size={16} /></button>
-                      <button type="button" className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><Table size={16} /></button>
+                      <button type="button" onClick={() => execCommand('undo')} className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><Undo2 size={16} /></button>
+                      <button type="button" onClick={() => execCommand('redo')} className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><Redo2 size={16} /></button>
                       <div className="w-px h-4 bg-gray-300 mx-1" />
-                      <button type="button" className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><Eraser size={16} /></button>
-                      <button type="button" className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><Printer size={16} /></button>
-                      <button type="button" className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><Code size={16} /></button>
-                      <button type="button" className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><Maximize2 size={16} /></button>
-                      <div className="w-px h-4 bg-gray-300 mx-1" />
-                      <button type="button" className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><Undo2 size={16} /></button>
-                      <button type="button" className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><Redo2 size={16} /></button>
+                      <button type="button" onClick={() => execCommand('removeFormat')} className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><Eraser size={16} /></button>
+                      <button type="button" onClick={() => window.print()} className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-300 text-gray-700"><Printer size={16} /></button>
                     </div>
                   </div>
 
-                  <textarea
-                    className="flex-1 w-full p-4 border border-t-0 border-gray-200 rounded-b-md font-body text-base leading-relaxed focus:outline-none focus:ring-1 focus:ring-accent/20 resize-none min-h-[300px]"
-                    value={formData.content}
-                    onChange={(e) => setFormData({...formData, content: e.target.value})}
-                    placeholder="Start typing your policy section content here..."
-                    required
+                  <div
+                    ref={editorRef}
+                    contentEditable
+                    className="flex-1 w-full p-4 border border-t-0 border-gray-200 rounded-b-md font-body text-base leading-relaxed focus:outline-none focus:ring-1 focus:ring-accent/20 overflow-y-auto min-h-[300px] bg-white"
+                    dangerouslySetInnerHTML={{ __html: formData.content }}
+                    onBlur={(e) => setFormData(prev => ({ ...prev, content: e.currentTarget.innerHTML }))}
                   />
                 </div>
               </div>
 
               <div className="p-4 flex gap-3 justify-end border-t border-gray-100 bg-gray-50/50">
-                <button 
-                  type="button" 
-                  onClick={closeModal} 
-                  className="px-6 py-2 text-gray-600 font-medium hover:bg-gray-100 rounded-md transition-colors text-sm"
-                >
+                <button type="button" onClick={closeModal} className="px-6 py-2 text-gray-600 font-medium hover:bg-gray-100 rounded-md transition-colors text-sm">
                   Cancel
                 </button>
-                <button 
-                  type="submit" 
-                  className="pronimal-btn-primary px-8 text-sm"
-                >
+                <button type="submit" className="pronimal-btn-primary px-8 text-sm">
                   {editingSection ? 'Update Section' : 'Publish Section'}
                 </button>
               </div>

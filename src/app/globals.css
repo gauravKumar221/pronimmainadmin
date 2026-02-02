@@ -4,16 +4,16 @@
 
 :root {
   --background: 210 20% 98%; /* #F9FAFB */
-  --foreground: 215 25% 27%; /* #374151 - using as base */
+  --foreground: 0 0% 35%; /* #595959 */
   
-  --primary: 215 25% 27%; /* #374151 - Dark Slate Blue */
+  --primary: 0 0% 35%; /* #595959 */
   --primary-foreground: 0 0% 100%;
 
   --accent: 2 100% 54%; /* #ff1c14 - Red */
   --accent-foreground: 0 0% 100%;
 
   --card: 0 0% 100%;
-  --card-foreground: 215 25% 27%;
+  --card-foreground: 0 0% 35%;
 
   --border: 214 32% 91%;
   --input: 214 32% 91%;
@@ -36,7 +36,7 @@
 }
 
 .adminix-btn-primary {
-  @apply bg-[#374151] text-white px-4 py-2 rounded-md hover:bg-[#2c3441] transition-colors duration-200 disabled:opacity-50 font-medium;
+  @apply bg-[#595959] text-white px-4 py-2 rounded-md hover:bg-[#4a4a4a] transition-colors duration-200 disabled:opacity-50 font-medium;
 }
 
 .adminix-btn-accent {

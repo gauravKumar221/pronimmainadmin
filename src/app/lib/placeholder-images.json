@@ -1,0 +1,17 @@
+
+{
+  "placeholderImages": [
+    {
+      "id": "banner-1",
+      "description": "Hero Banner 1",
+      "imageUrl": "https://picsum.photos/seed/adminix-1/1200/400",
+      "imageHint": "business office"
+    },
+    {
+      "id": "banner-2",
+      "description": "Hero Banner 2",
+      "imageUrl": "https://picsum.photos/seed/adminix-2/1200/400",
+      "imageHint": "technology abstract"
+    }
+  ]
+}

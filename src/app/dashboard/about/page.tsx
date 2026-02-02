@@ -25,7 +25,7 @@ import {
 
 export default function AboutUsPage() {
   const [content, setContent] = useState<string>('');
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const editorRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

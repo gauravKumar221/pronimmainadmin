@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Plus, Pencil, Trash2, X } from 'lucide-react';
+import { Plus, Pencil, Trash2, X, FileText } from 'lucide-react';
 
 interface PrivacySection {
   id: string;
@@ -119,12 +119,17 @@ export default function PrivacyPolicyPage() {
       </div>
 
       <div className="pronimal-card p-8">
-        <div className="space-y-6">
+        <div className="flex items-center gap-2 mb-8 pb-4 border-b border-gray-100">
+          <FileText className="text-accent" size={24} />
+          <h2 className="text-xl font-bold text-primary">Legal Document</h2>
+        </div>
+
+        <div className="space-y-8">
           {sections.length > 0 ? (
             sections.map((section) => (
-              <div key={section.id} className="relative group border-b border-gray-50 last:border-0 pb-6 last:pb-0">
-                <div className="flex justify-between items-start mb-3">
-                  <h2 className="text-lg font-bold text-primary">{section.title}</h2>
+              <div key={section.id} className="relative group pb-8 last:pb-0 border-b last:border-0 border-gray-50">
+                <div className="flex justify-between items-start mb-4">
+                  <h3 className="text-lg font-bold text-primary">{section.title}</h3>
                   <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button 
                       onClick={() => openModal(section)}
@@ -142,9 +147,9 @@ export default function PrivacyPolicyPage() {
                     </button>
                   </div>
                 </div>
-                <p className="text-gray-700 leading-relaxed">
+                <div className="text-gray-700 leading-relaxed whitespace-pre-wrap">
                   {section.content}
-                </p>
+                </div>
               </div>
             ))
           ) : (
@@ -157,21 +162,24 @@ export default function PrivacyPolicyPage() {
 
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-lg w-full shadow-xl animate-in zoom-in-95">
-            <div className="p-6 border-b border-gray-100 flex justify-between items-center">
-              <h2 className="text-xl font-bold text-primary">
-                {editingSection ? 'Edit Section' : 'Add New Section'}
-              </h2>
-              <button onClick={closeModal} className="text-gray-400 hover:text-gray-600">
+          <div className="bg-white rounded-lg max-w-2xl w-full shadow-xl animate-in zoom-in-95">
+            <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50 rounded-t-lg">
+              <div className="flex items-center gap-2">
+                <Pencil className="text-accent" size={20} />
+                <h2 className="text-xl font-bold text-primary">
+                  {editingSection ? 'Section Editor' : 'New Section Editor'}
+                </h2>
+              </div>
+              <button onClick={closeModal} className="text-gray-400 hover:text-gray-600 transition-colors">
                 <X size={24} />
               </button>
             </div>
-            <form onSubmit={handleSubmit} className="p-6 space-y-4">
+            <form onSubmit={handleSubmit} className="p-6 space-y-6">
               <div>
                 <label className="pronimal-label">Section Title</label>
                 <input
                   type="text"
-                  className="pronimal-input"
+                  className="pronimal-input font-semibold"
                   value={formData.title}
                   onChange={(e) => setFormData({...formData, title: e.target.value})}
                   placeholder="e.g. 1. Introduction"
@@ -179,21 +187,33 @@ export default function PrivacyPolicyPage() {
                 />
               </div>
               <div>
-                <label className="pronimal-label">Content</label>
-                <textarea
-                  className="pronimal-input min-h-[200px]"
-                  value={formData.content}
-                  onChange={(e) => setFormData({...formData, content: e.target.value})}
-                  placeholder="Enter the section content..."
-                  required
-                />
+                <label className="pronimal-label">Content Editor</label>
+                <div className="relative group">
+                  <textarea
+                    className="pronimal-input min-h-[300px] font-body text-base leading-relaxed resize-y focus:ring-accent"
+                    value={formData.content}
+                    onChange={(e) => setFormData({...formData, content: e.target.value})}
+                    placeholder="Type your policy content here..."
+                    required
+                  />
+                  <div className="absolute bottom-3 right-3 text-xs text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                    Markdown not supported (Plain Text)
+                  </div>
+                </div>
               </div>
-              <div className="pt-4 flex gap-3 justify-end">
-                <button type="button" onClick={closeModal} className="px-4 py-2 text-gray-600 font-medium">
+              <div className="pt-4 flex gap-3 justify-end border-t border-gray-100">
+                <button 
+                  type="button" 
+                  onClick={closeModal} 
+                  className="px-6 py-2.5 text-gray-600 font-medium hover:bg-gray-100 rounded-md transition-colors"
+                >
                   Cancel
                 </button>
-                <button type="submit" className="pronimal-btn-primary">
-                  {editingSection ? 'Update Section' : 'Add Section'}
+                <button 
+                  type="submit" 
+                  className="pronimal-btn-primary px-8"
+                >
+                  {editingSection ? 'Save Changes' : 'Publish Section'}
                 </button>
               </div>
             </form>

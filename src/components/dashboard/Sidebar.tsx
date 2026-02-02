@@ -1,3 +1,4 @@
+
 'use client';
 
 import React from 'react';
@@ -27,7 +28,7 @@ const navItems = [
   { name: 'Agencies', href: '/dashboard/agency', icon: Building2 },
   { name: 'Owners', href: '/dashboard/owner', icon: Contact },
   { name: 'Newsletter', href: '/dashboard/newsletter', icon: Mail },
-  { name: 'Inquiries', href: '/dashboard/contact', icon: MessageSquare },
+  { name: 'Contact Us', href: '/dashboard/contact', icon: MessageSquare },
   { name: 'About Us', href: '/dashboard/about', icon: Info },
   { name: 'FAQs', href: '/dashboard/faqs', icon: HelpCircle },
   { name: 'Privacy Policy', href: '/dashboard/privacy', icon: ShieldCheck },

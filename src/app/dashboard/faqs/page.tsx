@@ -7,7 +7,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Plus, Pencil, Trash2, X } from 'lucide-react';
+import { Plus, Pencil, Trash2, X, HelpCircle, Info } from 'lucide-react';
 
 interface FAQ {
   id: string;
@@ -16,63 +16,58 @@ interface FAQ {
 }
 
 export default function FAQsPage() {
-  const [faqs, setFaqs] = useState<FAQ[]>([]);
+  const [generalFaqs, setGeneralFaqs] = useState<FAQ[]>([]);
+  const [aboutUsFaqs, setAboutUsFaqs] = useState<FAQ[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingFaq, setEditingFaq] = useState<FAQ | null>(null);
+  const [editingFaq, setEditingFaq] = useState<{ faq: FAQ, type: 'general' | 'about' } | null>(null);
+  const [modalType, setModalType] = useState<'general' | 'about'>('general');
   const [formData, setFormData] = useState({
     question: '',
     answer: '',
   });
 
   useEffect(() => {
-    const saved = localStorage.getItem('pronimal_faqs');
-    if (saved) {
-      setFaqs(JSON.parse(saved));
+    // Load General FAQs
+    const savedGeneral = localStorage.getItem('pronimal_faqs');
+    if (savedGeneral) {
+      setGeneralFaqs(JSON.parse(savedGeneral));
     } else {
-      const initial = [
-        {
-          id: '1',
-          question: "What is Pronim.al?",
-          answer: "Pronim.al is a comprehensive admin dashboard designed for agencies and agents to manage their blog posts, banners, agents, agencies, and property owners in one centralized location."
-        },
-        {
-          id: '2',
-          question: "How do I add a new agent?",
-          answer: "Navigate to the 'Agents' section in the sidebar and click on the 'Add Agent' button at the top right. Fill in the required details and save."
-        },
-        {
-          id: '3',
-          question: "Can I upload my own images for banners?",
-          answer: "Yes! In the 'Banner Management' section, you can either provide a direct image URL or use the upload button to select a local image from your device."
-        },
-        {
-          id: '4',
-          question: "Where is my data stored?",
-          answer: "Currently, as a prototype, your data is stored in your browser's local storage. This means it is specific to your device and browser."
-        },
-        {
-          id: '5',
-          question: "How do I reset my last login time?",
-          answer: "The login time is automatically updated every time you sign in. You can also clear your browser's local storage to reset all dashboard data."
-        }
+      const initialGeneral = [
+        { id: '1', question: "What is Pronim.al?", answer: "Pronim.al is a comprehensive admin dashboard for agencies and agents." },
+        { id: '2', question: "How do I add a new agent?", answer: "Navigate to 'Agents' and click 'Add Agent'." }
       ];
-      setFaqs(initial);
-      localStorage.setItem('pronimal_faqs', JSON.stringify(initial));
+      setGeneralFaqs(initialGeneral);
+      localStorage.setItem('pronimal_faqs', JSON.stringify(initialGeneral));
+    }
+
+    // Load About Us FAQs
+    const savedAbout = localStorage.getItem('pronimal_about_faq_list');
+    if (savedAbout) {
+      setAboutUsFaqs(JSON.parse(savedAbout));
+    } else {
+      const initialAbout = [
+        { id: 'a1', question: "How was Pronim.al started?", answer: "Started by a team of real estate professionals and tech innovators." }
+      ];
+      setAboutUsFaqs(initialAbout);
+      localStorage.setItem('pronimal_about_faq_list', JSON.stringify(initialAbout));
     }
   }, []);
 
-  const saveFaqs = (updated: FAQ[]) => {
-    setFaqs(updated);
-    localStorage.setItem('pronimal_faqs', JSON.stringify(updated));
+  const saveFaqs = (type: 'general' | 'about', updated: FAQ[]) => {
+    if (type === 'general') {
+      setGeneralFaqs(updated);
+      localStorage.setItem('pronimal_faqs', JSON.stringify(updated));
+    } else {
+      setAboutUsFaqs(updated);
+      localStorage.setItem('pronimal_about_faq_list', JSON.stringify(updated));
+    }
   };
 
-  const openModal = (faq?: FAQ) => {
+  const openModal = (type: 'general' | 'about', faq?: FAQ) => {
+    setModalType(type);
     if (faq) {
-      setEditingFaq(faq);
-      setFormData({
-        question: faq.question,
-        answer: faq.answer,
-      });
+      setEditingFaq({ faq, type });
+      setFormData({ question: faq.question, answer: faq.answer });
     } else {
       setEditingFaq(null);
       setFormData({ question: '', answer: '' });
@@ -88,91 +83,132 @@ export default function FAQsPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const currentList = modalType === 'general' ? generalFaqs : aboutUsFaqs;
     let updated;
+
     if (editingFaq) {
-      updated = faqs.map(f => f.id === editingFaq.id ? { ...f, ...formData } : f);
+      updated = currentList.map(f => f.id === editingFaq.faq.id ? { ...f, ...formData } : f);
     } else {
       const newFaq = {
         id: Math.random().toString(36).substr(2, 9),
         ...formData,
       };
-      updated = [...faqs, newFaq];
+      updated = [...currentList, newFaq];
     }
-    saveFaqs(updated);
+    
+    saveFaqs(modalType, updated);
     closeModal();
   };
 
-  const handleDelete = (id: string, e: React.MouseEvent) => {
+  const handleDelete = (type: 'general' | 'about', id: string, e: React.MouseEvent) => {
     e.stopPropagation();
     if (confirm('Are you sure you want to delete this FAQ?')) {
-      saveFaqs(faqs.filter(f => f.id !== id));
+      const currentList = type === 'general' ? generalFaqs : aboutUsFaqs;
+      saveFaqs(type, currentList.filter(f => f.id !== id));
     }
   };
 
-  const handleEdit = (faq: FAQ, e: React.MouseEvent) => {
-    e.stopPropagation();
-    openModal(faq);
-  };
-
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-primary">Frequently Asked Questions</h1>
-          <p className="text-gray-500">Manage common questions about using the Pronim.al dashboard</p>
-        </div>
-        <button 
-          onClick={() => openModal()}
-          className="pronimal-btn-accent flex items-center gap-2"
-        >
-          <Plus size={18} />
-          <span>Add FAQ</span>
-        </button>
+    <div className="space-y-8">
+      <div>
+        <h1 className="text-2xl font-bold text-primary">Frequently Asked Questions</h1>
+        <p className="text-gray-500">Manage all your dashboard and company related questions</p>
       </div>
 
-      <div className="pronimal-card p-6">
-        {faqs.length > 0 ? (
-          <Accordion type="single" collapsible className="w-full">
-            {faqs.map((faq) => (
-              <AccordionItem key={faq.id} value={faq.id} className="border-b last:border-0">
-                <div className="flex items-center justify-between group">
-                  <AccordionTrigger className="text-left font-semibold text-primary flex-1 hover:no-underline">
-                    {faq.question}
-                  </AccordionTrigger>
-                  <div className="flex items-center gap-2 px-4">
-                    <button 
-                      onClick={(e) => handleEdit(faq, e)}
-                      className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
-                      title="Edit FAQ"
-                    >
-                      <Pencil size={16} />
-                    </button>
-                    <button 
-                      onClick={(e) => handleDelete(faq.id, e)}
-                      className="p-1.5 text-red-600 hover:bg-red-50 rounded-md transition-colors"
-                      title="Delete FAQ"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                </div>
-                <AccordionContent className="text-gray-600 leading-relaxed">
-                  {faq.answer}
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
-        ) : (
-          <div className="text-center py-12 text-gray-400">
-            No FAQs found. Click "Add FAQ" to create one.
+      {/* General FAQs Section */}
+      <div className="space-y-4">
+        <div className="flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            <HelpCircle size={20} className="text-accent" />
+            <h2 className="text-xl font-bold text-primary">General FAQs</h2>
           </div>
-        )}
+          <button 
+            onClick={() => openModal('general')}
+            className="pronimal-btn-accent flex items-center gap-2"
+          >
+            <Plus size={18} />
+            <span>Add General FAQ</span>
+          </button>
+        </div>
+        <div className="pronimal-card p-6">
+          {generalFaqs.length > 0 ? (
+            <Accordion type="single" collapsible className="w-full">
+              {generalFaqs.map((faq) => (
+                <AccordionItem key={faq.id} value={faq.id} className="border-b last:border-0">
+                  <div className="flex items-center justify-between group">
+                    <AccordionTrigger className="text-left font-semibold text-primary flex-1 hover:no-underline">
+                      {faq.question}
+                    </AccordionTrigger>
+                    <div className="flex items-center gap-2 px-4">
+                      <button onClick={(e) => { e.stopPropagation(); openModal('general', faq); }} className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-md">
+                        <Pencil size={16} />
+                      </button>
+                      <button onClick={(e) => handleDelete('general', faq.id, e)} className="p-1.5 text-red-600 hover:bg-red-50 rounded-md">
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  </div>
+                  <AccordionContent className="text-gray-600 leading-relaxed">
+                    {faq.answer}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          ) : (
+            <div className="text-center py-8 text-gray-400">No General FAQs found.</div>
+          )}
+        </div>
+      </div>
+
+      {/* About Us FAQs Section */}
+      <div className="space-y-4">
+        <div className="flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            <Info size={20} className="text-accent" />
+            <h2 className="text-xl font-bold text-primary">About Us FAQs</h2>
+          </div>
+          <button 
+            onClick={() => openModal('about')}
+            className="pronimal-btn-accent flex items-center gap-2"
+          >
+            <Plus size={18} />
+            <span>Add About FAQ</span>
+          </button>
+        </div>
+        <div className="pronimal-card p-6">
+          {aboutUsFaqs.length > 0 ? (
+            <Accordion type="single" collapsible className="w-full">
+              {aboutUsFaqs.map((faq) => (
+                <AccordionItem key={faq.id} value={faq.id} className="border-b last:border-0">
+                  <div className="flex items-center justify-between group">
+                    <AccordionTrigger className="text-left font-semibold text-primary flex-1 hover:no-underline">
+                      {faq.question}
+                    </AccordionTrigger>
+                    <div className="flex items-center gap-2 px-4">
+                      <button onClick={(e) => { e.stopPropagation(); openModal('about', faq); }} className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-md">
+                        <Pencil size={16} />
+                      </button>
+                      <button onClick={(e) => handleDelete('about', faq.id, e)} className="p-1.5 text-red-600 hover:bg-red-50 rounded-md">
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  </div>
+                  <AccordionContent className="text-gray-600 leading-relaxed">
+                    {faq.answer}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          ) : (
+            <div className="text-center py-8 text-gray-400">No About Us FAQs found.</div>
+          )}
+        </div>
       </div>
 
       <div className="bg-white border border-gray-100 p-8 rounded-lg text-center space-y-4">
         <h2 className="text-lg font-bold text-primary">Still have questions?</h2>
         <p className="text-gray-500 max-w-md mx-auto">
-          If you couldn't find the answer you were looking for, feel free to reach out to our support team for assistance.
+          Reach out to our support team for assistance.
         </p>
         <button className="pronimal-btn-accent">Contact Support</button>
       </div>
@@ -182,7 +218,7 @@ export default function FAQsPage() {
           <div className="bg-white rounded-lg max-w-lg w-full shadow-xl animate-in zoom-in-95">
             <div className="p-6 border-b border-gray-100 flex justify-between items-center">
               <h2 className="text-xl font-bold text-primary">
-                {editingFaq ? 'Edit FAQ' : 'Add New FAQ'}
+                {editingFaq ? 'Edit FAQ' : `Add New ${modalType === 'general' ? 'General' : 'About Us'} FAQ`}
               </h2>
               <button onClick={closeModal} className="text-gray-400 hover:text-gray-600">
                 <X size={24} />
@@ -196,7 +232,6 @@ export default function FAQsPage() {
                   className="pronimal-input"
                   value={formData.question}
                   onChange={(e) => setFormData({...formData, question: e.target.value})}
-                  placeholder="e.g. How do I change my password?"
                   required
                 />
               </div>
@@ -206,16 +241,13 @@ export default function FAQsPage() {
                   className="pronimal-input min-h-[150px]"
                   value={formData.answer}
                   onChange={(e) => setFormData({...formData, answer: e.target.value})}
-                  placeholder="Provide a clear and concise answer..."
                   required
                 />
               </div>
               <div className="pt-4 flex gap-3 justify-end">
-                <button type="button" onClick={closeModal} className="px-4 py-2 text-gray-600 font-medium">
-                  Cancel
-                </button>
+                <button type="button" onClick={closeModal} className="px-4 py-2 text-gray-600 font-medium">Cancel</button>
                 <button type="submit" className="pronimal-btn-primary">
-                  {editingFaq ? 'Update FAQ' : 'Create FAQ'}
+                  {editingFaq ? 'Update' : 'Create'}
                 </button>
               </div>
             </form>

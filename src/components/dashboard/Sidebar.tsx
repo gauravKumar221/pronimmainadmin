@@ -84,7 +84,7 @@ export default function AppSidebar() {
                       className={`
                         transition-all duration-200
                         ${isActive 
-                          ? 'bg-primary text-white hover:bg-primary/90' 
+                          ? '!bg-primary !text-white hover:!bg-primary/90' 
                           : 'text-gray-300 hover:bg-white/10 hover:text-white'
                         }
                       `}

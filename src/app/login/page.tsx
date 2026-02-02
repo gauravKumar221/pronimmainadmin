@@ -21,6 +21,8 @@ export default function LoginPage() {
       const result = await loginAction(identifier, password);
 
       if (result.success) {
+        // Store the login time in localStorage
+        localStorage.setItem('admin_last_login', new Date().toISOString());
         router.push('/dashboard');
       } else {
         setError(result.error || 'Invalid login attempt');

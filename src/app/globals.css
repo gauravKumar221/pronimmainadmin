@@ -7,7 +7,7 @@
   --background: 210 20% 98%; /* #F9FAFB */
   --foreground: 0 0% 35%; /* #595959 */
   
-  --primary: 0 0% 35%; /* #595959 */
+  --primary: 2 100% 54%; /* #ff1c14 - Red */
   --primary-foreground: 0 0% 100%;
 
   --accent: 2 100% 54%; /* #ff1c14 - Red */
@@ -23,9 +23,9 @@
   --radius: 0.5rem;
 
   /* Sidebar Theme */
-  --sidebar-background: 0 0% 35%;
+  --sidebar-background: 0 0% 35%; /* Dark Gray */
   --sidebar-foreground: 0 0% 100%;
-  --sidebar-primary: 2 100% 54%;
+  --sidebar-primary: 2 100% 54%; /* Red */
   --sidebar-primary-foreground: 0 0% 100%;
   --sidebar-accent: 0 0% 45%;
   --sidebar-accent-foreground: 0 0% 100%;
@@ -47,7 +47,7 @@
 }
 
 .pronimal-btn-primary {
-  @apply bg-[#595959] text-white px-4 py-2 rounded-md hover:bg-[#4a4a4a] transition-colors duration-200 disabled:opacity-50 font-medium;
+  @apply bg-[#ff1c14] text-white px-4 py-2 rounded-md hover:bg-[#e01811] transition-colors duration-200 disabled:opacity-50 font-medium;
 }
 
 .pronimal-btn-accent {

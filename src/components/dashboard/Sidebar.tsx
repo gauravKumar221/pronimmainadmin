@@ -61,7 +61,7 @@ export default function AppSidebar() {
   return (
     <Sidebar collapsible="icon" className="border-r-0">
       <SidebarHeader className="p-4 flex flex-row items-center gap-2 overflow-hidden bg-primary h-16 shrink-0">
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-accent text-white">
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white text-primary shadow-sm">
           <span className="font-bold text-lg">P</span>
         </div>
         {state === "expanded" && (
@@ -69,7 +69,7 @@ export default function AppSidebar() {
         )}
       </SidebarHeader>
       
-      <SidebarContent className="bg-primary">
+      <SidebarContent className="bg-sidebar">
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -84,8 +84,8 @@ export default function AppSidebar() {
                       className={`
                         transition-all duration-200
                         ${isActive 
-                          ? 'bg-accent text-white hover:bg-accent/90' 
-                          : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+                          ? 'bg-primary text-white hover:bg-primary/90' 
+                          : 'text-gray-300 hover:bg-gray-700/50 hover:text-white'
                         }
                       `}
                     >
@@ -102,7 +102,7 @@ export default function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="p-2 border-t border-gray-700 bg-primary">
+      <SidebarFooter className="p-2 border-t border-gray-700 bg-sidebar">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton

@@ -1,16 +1,17 @@
-
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Plus, Pencil, Trash2, X, Image as ImageIcon, Upload } from 'lucide-react';
 import Image from 'next/image';
+import { RichTextEditor } from '@/components/RichTextEditor';
+import { fetchBlogs, createBlog, updateBlog, deleteBlog, uploadBlogImage, type BlogPost } from '@/lib/api';
 
-interface BlogPost {
-  id: string;
-  title: string;
-  description: string;
-  imageUrl: string;
-  createdAt: string;
+function stripHtml(html: string): string {
+  if (!html) return '';
+  if (typeof document === 'undefined') return html.replace(/<[^>]*>/g, '');
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html;
+  return tmp.textContent || tmp.innerText || '';
 }
 
 export default function BlogManagement() {
@@ -20,74 +21,91 @@ export default function BlogManagement() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [imageUrl, setImageUrl] = useState('');
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [error, setError] = useState('');
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    const saved = localStorage.getItem('pronimal_blogs');
-    if (saved) {
-      setPosts(JSON.parse(saved));
-    } else {
-      const initialPosts: BlogPost[] = [
-        { 
-          id: '1', 
-          title: 'Welcome to Pronim.al', 
-          description: 'This is your first admin post.', 
-          imageUrl: 'https://picsum.photos/seed/blog-1/600/400',
-          createdAt: new Date().toISOString() 
-        },
-        { 
-          id: '2', 
-          title: 'Admin Tips & Tricks', 
-          description: 'How to use the dashboard effectively.', 
-          imageUrl: 'https://picsum.photos/seed/blog-2/600/400',
-          createdAt: new Date().toISOString() 
-        },
-      ];
-      setPosts(initialPosts);
-      localStorage.setItem('pronimal_blogs', JSON.stringify(initialPosts));
+  const loadBlogs = useCallback(async () => {
+    setIsLoading(true);
+    setError('');
+    try {
+      const data = await fetchBlogs();
+      setPosts(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load blogs');
+      setPosts([]);
+    } finally {
+      setIsLoading(false);
     }
   }, []);
 
-  const savePosts = (newPosts: BlogPost[]) => {
-    setPosts(newPosts);
-    localStorage.setItem('pronimal_blogs', JSON.stringify(newPosts));
-  };
+  useEffect(() => {
+    loadBlogs();
+  }, [loadBlogs]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (editingPost) {
-      const updated = posts.map(p => 
-        p.id === editingPost.id ? { ...p, title, description, imageUrl } : p
-      );
-      savePosts(updated);
-    } else {
-      const newPost: BlogPost = {
-        id: Math.random().toString(36).substr(2, 9),
-        title,
-        description,
-        imageUrl: imageUrl || 'https://picsum.photos/seed/default/600/400',
-        createdAt: new Date().toISOString(),
-      };
-      savePosts([newPost, ...posts]);
+    if (!stripHtml(description).trim()) {
+      setError('Description is required');
+      return;
     }
-    closeModal();
+    setIsLoading(true);
+    setError('');
+    try {
+      if (editingPost) {
+        await updateBlog(editingPost.id, {
+          title,
+          description,
+          imageUrl: imageUrl || undefined,
+        });
+      } else {
+        await createBlog({
+          title,
+          description,
+          imageUrl: imageUrl || undefined,
+        });
+      }
+      await loadBlogs();
+      closeModal();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Operation failed');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleDelete = (id: string) => {
-    if (confirm('Are you sure you want to delete this post?')) {
-      const filtered = posts.filter(p => p.id !== id);
-      savePosts(filtered);
+  const handleDelete = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this post?')) return;
+    setIsLoading(true);
+    setError('');
+    try {
+      await deleteBlog(id);
+      await loadBlogs();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to delete');
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImageUrl(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      setError('Please select an image file (JPEG, PNG, etc.)');
+      return;
+    }
+    setUploadingImage(true);
+    setError('');
+    try {
+      const url = await uploadBlogImage(file);
+      setImageUrl(url);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to upload image');
+    } finally {
+      setUploadingImage(false);
+      e.target.value = '';
     }
   };
 
@@ -96,13 +114,14 @@ export default function BlogManagement() {
       setEditingPost(post);
       setTitle(post.title);
       setDescription(post.description);
-      setImageUrl(post.imageUrl);
+      setImageUrl(post.imageUrl || '');
     } else {
       setEditingPost(null);
       setTitle('');
       setDescription('');
       setImageUrl('');
     }
+    setError('');
     setIsModalOpen(true);
   };
 
@@ -112,6 +131,7 @@ export default function BlogManagement() {
     setTitle('');
     setDescription('');
     setImageUrl('');
+    setError('');
   };
 
   return (
@@ -121,14 +141,21 @@ export default function BlogManagement() {
           <h1 className="text-2xl font-bold text-primary">Blog Management</h1>
           <p className="text-gray-500">Manage your website articles and updates</p>
         </div>
-        <button 
+        <button
           onClick={() => openModal()}
+          disabled={isLoading}
           className="pronimal-btn-accent flex items-center gap-2"
         >
           <Plus size={18} />
           <span>New Post</span>
         </button>
       </div>
+
+      {error && (
+        <div className="p-3 bg-red-50 text-red-600 border border-red-100 rounded-md text-sm">
+          {error}
+        </div>
+      )}
 
       <div className="pronimal-card">
         <table className="pronimal-table">
@@ -142,7 +169,13 @@ export default function BlogManagement() {
             </tr>
           </thead>
           <tbody>
-            {posts.length > 0 ? (
+            {isLoading && posts.length === 0 ? (
+              <tr>
+                <td colSpan={5} className="text-center py-8 text-gray-400">
+                  Loading...
+                </td>
+              </tr>
+            ) : posts.length > 0 ? (
               posts.map((post) => (
                 <tr key={post.id}>
                   <td>
@@ -153,6 +186,7 @@ export default function BlogManagement() {
                           alt={post.title}
                           fill
                           className="object-cover"
+                          unoptimized={post.imageUrl.startsWith('data:')}
                         />
                       ) : (
                         <div className="flex items-center justify-center h-full text-gray-400">
@@ -162,17 +196,19 @@ export default function BlogManagement() {
                     </div>
                   </td>
                   <td className="font-semibold">{post.title}</td>
-                  <td className="max-w-xs truncate">{post.description}</td>
+                  <td className="max-w-xs truncate">{stripHtml(post.description)}</td>
                   <td>{new Date(post.createdAt).toLocaleDateString()}</td>
                   <td className="text-right space-x-2">
-                    <button 
+                    <button
                       onClick={() => openModal(post)}
+                      disabled={isLoading}
                       className="p-2 text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
                     >
                       <Pencil size={18} />
                     </button>
-                    <button 
+                    <button
                       onClick={() => handleDelete(post.id)}
+                      disabled={isLoading}
                       className="p-2 text-red-600 hover:bg-red-50 rounded-md transition-colors"
                     >
                       <Trash2 size={18} />
@@ -213,7 +249,7 @@ export default function BlogManagement() {
                   required
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <label className="pronimal-label">Post Image</label>
                 <div className="flex gap-2">
@@ -227,10 +263,15 @@ export default function BlogManagement() {
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="px-3 py-2 border border-gray-300 rounded-md hover:bg-gray-50 text-gray-600"
-                    title="Upload local image"
+                    disabled={uploadingImage}
+                    className="px-3 py-2 border border-gray-300 rounded-md hover:bg-gray-50 text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                    title="Upload image to S3"
                   >
-                    <Upload size={20} />
+                    {uploadingImage ? (
+                      <span className="text-xs">Uploading...</span>
+                    ) : (
+                      <Upload size={20} />
+                    )}
                   </button>
                   <input
                     type="file"
@@ -247,6 +288,7 @@ export default function BlogManagement() {
                       alt="Preview"
                       fill
                       className="object-cover"
+                      unoptimized={imageUrl.startsWith('data:') || imageUrl.includes('amazonaws')}
                     />
                   </div>
                 )}
@@ -254,19 +296,20 @@ export default function BlogManagement() {
 
               <div>
                 <label className="pronimal-label">Description</label>
-                <textarea
-                  className="pronimal-input min-h-[120px]"
+                <RichTextEditor
+                  key={editingPost?.id ?? 'new'}
                   value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  required
+                  onChange={setDescription}
+                  placeholder="Write your post description or content..."
+                  minHeight="160px"
                 />
               </div>
               <div className="pt-4 flex gap-3 justify-end">
                 <button type="button" onClick={closeModal} className="px-4 py-2 text-gray-600 font-medium">
                   Cancel
                 </button>
-                <button type="submit" className="pronimal-btn-primary">
-                  {editingPost ? 'Update Post' : 'Publish Post'}
+                <button type="submit" disabled={isLoading} className="pronimal-btn-primary">
+                  {isLoading ? 'Saving...' : editingPost ? 'Update Post' : 'Publish Post'}
                 </button>
               </div>
             </form>

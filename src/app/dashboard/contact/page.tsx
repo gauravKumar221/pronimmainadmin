@@ -7,61 +7,68 @@ import {
   Eye, 
   X,
   Clock,
-  User
+  User,
+  Phone
 } from 'lucide-react';
+import { fetchSendMessages, markSendMessageAsRead, deleteSendMessage, SendMessage } from '@/lib/api';
 
-interface ContactMessage {
-  id: string;
-  name: string;
-  email: string;
-  subject: string;
-  message: string;
-  createdAt: string;
-  isRead: boolean;
+function getSubjectPreview(message: string, maxLen = 50): string {
+  const text = message.trim();
+  return text.length <= maxLen ? text : text.slice(0, maxLen) + '…';
 }
 
 export default function ContactUsPage() {
-  const [messages, setMessages] = useState<ContactMessage[]>([]);
-  const [selectedMessage, setSelectedMessage] = useState<ContactMessage | null>(null);
+  const [messages, setMessages] = useState<SendMessage[]>([]);
+  const [selectedMessage, setSelectedMessage] = useState<SendMessage | null>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const savedMessages = localStorage.getItem('pronimal_contact_messages');
-    if (savedMessages) {
-      setMessages(JSON.parse(savedMessages));
-    } else {
-      const initialMessages: ContactMessage[] = [
-        {
-          id: '1',
-          name: 'John Smith',
-          email: 'john.smith@example.com',
-          subject: 'Partnership Inquiry',
-          message: 'Hello, I am interested in partnering with Pronim.al for our real estate projects in London. Looking forward to hearing from you.',
-          createdAt: new Date(Date.now() - 3600000).toISOString(),
-          isRead: false
-        }
-      ];
-      setMessages(initialMessages);
-      localStorage.setItem('pronimal_contact_messages', JSON.stringify(initialMessages));
-    }
-  }, []);
-
-  const deleteMessage = (id: string) => {
-    if (confirm('Are you sure you want to delete this message?')) {
-      const updated = messages.filter(m => m.id !== id);
-      setMessages(updated);
-      localStorage.setItem('pronimal_contact_messages', JSON.stringify(updated));
+  const loadMessages = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await fetchSendMessages({ page: 1, limit: 100 });
+      setMessages(data.messages);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load messages');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const openMessage = (msg: ContactMessage) => {
+  useEffect(() => {
+    loadMessages();
+  }, []);
+
+  const handleDeleteMessage = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this message?')) return;
+    try {
+      await deleteSendMessage(id);
+      setMessages((prev) => prev.filter((m) => m.id !== id));
+      if (selectedMessage?.id === id) {
+        setIsViewModalOpen(false);
+        setSelectedMessage(null);
+      }
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Failed to delete');
+    }
+  };
+
+  const openMessage = async (msg: SendMessage) => {
     setSelectedMessage(msg);
     setIsViewModalOpen(true);
-    
+
     if (!msg.isRead) {
-      const updated = messages.map(m => m.id === msg.id ? { ...m, isRead: true } : m);
-      setMessages(updated);
-      localStorage.setItem('pronimal_contact_messages', JSON.stringify(updated));
+      try {
+        const updated = await markSendMessageAsRead(msg.id, true);
+        setMessages((prev) =>
+          prev.map((m) => (m.id === msg.id ? { ...m, isRead: updated.isRead } : m))
+        );
+        setSelectedMessage((s) => (s?.id === msg.id ? { ...s, isRead: true } : s));
+      } catch {
+        // Ignore - still show message
+      }
     }
   };
 
@@ -90,16 +97,26 @@ export default function ContactUsPage() {
             </tr>
           </thead>
           <tbody>
-            {messages.length > 0 ? (
+            {loading ? (
+              <tr>
+                <td colSpan={5} className="text-center py-12 text-gray-500">Loading…</td>
+              </tr>
+            ) : error ? (
+              <tr>
+                <td colSpan={5} className="text-center py-12 text-red-500">{error}</td>
+              </tr>
+            ) : messages.length > 0 ? (
               messages.map((msg) => (
                 <tr key={msg.id} className={!msg.isRead ? 'bg-blue-50/30' : ''}>
                   <td>
                     <div className="flex flex-col">
-                      <span className="font-semibold text-primary">{msg.name}</span>
+                      <span className="font-semibold text-primary">
+                        {msg.name} {msg.lastName}
+                      </span>
                       <span className="text-xs text-gray-500">{msg.email}</span>
                     </div>
                   </td>
-                  <td className="max-w-xs truncate font-medium">{msg.subject}</td>
+                  <td className="max-w-xs truncate font-medium">{getSubjectPreview(msg.message)}</td>
                   <td className="text-gray-500">{new Date(msg.createdAt).toLocaleDateString()}</td>
                   <td>
                     <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
@@ -112,7 +129,7 @@ export default function ContactUsPage() {
                     <button onClick={() => openMessage(msg)} className="text-blue-600 hover:bg-blue-50 p-2 rounded-md transition-colors">
                       <Eye size={18} />
                     </button>
-                    <button onClick={() => deleteMessage(msg.id)} className="text-red-500 hover:bg-red-50 p-2 rounded-md transition-colors">
+                    <button onClick={() => handleDeleteMessage(msg.id)} className="text-red-500 hover:bg-red-50 p-2 rounded-md transition-colors">
                       <Trash2 size={18} />
                     </button>
                   </td>
@@ -144,8 +161,11 @@ export default function ContactUsPage() {
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div className="p-4 bg-gray-50 rounded-lg">
                   <p className="text-gray-400 uppercase text-[10px] font-bold tracking-widest mb-1">From</p>
-                  <p className="font-bold text-primary flex items-center gap-2"><User size={14} className="text-accent" /> {selectedMessage.name}</p>
+                  <p className="font-bold text-primary flex items-center gap-2"><User size={14} className="text-accent" /> {selectedMessage.name} {selectedMessage.lastName}</p>
                   <p className="text-gray-600">{selectedMessage.email}</p>
+                  {selectedMessage.phone && (
+                    <p className="text-gray-600 flex items-center gap-1 mt-1"><Phone size={12} /> {selectedMessage.phone}</p>
+                  )}
                 </div>
                 <div className="p-4 bg-gray-50 rounded-lg">
                   <p className="text-gray-400 uppercase text-[10px] font-bold tracking-widest mb-1">Sent On</p>
@@ -153,7 +173,7 @@ export default function ContactUsPage() {
                 </div>
               </div>
               <div className="bg-gray-50 p-6 rounded-lg text-gray-700 leading-relaxed whitespace-pre-wrap">
-                <p className="font-bold mb-2">Subject: {selectedMessage.subject}</p>
+                <p className="font-bold mb-2">Message</p>
                 {selectedMessage.message}
               </div>
             </div>

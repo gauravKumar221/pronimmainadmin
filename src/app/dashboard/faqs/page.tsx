@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -7,69 +6,66 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion";
-import { Plus, Pencil, Trash2, X, HelpCircle, Info } from 'lucide-react';
+} from '@/components/ui/accordion';
+import { Plus, Pencil, Trash2, X, HelpCircle } from 'lucide-react';
+import { fetchFaqs, createFaq, updateFaq, deleteFaq, Faq } from '@/lib/api';
 
-interface FAQ {
-  id: string;
-  question: string;
-  answer: string;
-}
+const CATEGORIES = [
+  { value: 'sale', label: 'Questions about the sale' },
+  { value: 'rent', label: 'Question about renting' },
+  { value: 'general', label: 'General' },
+  { value: 'about', label: 'About Us' },
+] as const;
+
+type Category = (typeof CATEGORIES)[number]['value'];
 
 export default function FAQsPage() {
-  const [generalFaqs, setGeneralFaqs] = useState<FAQ[]>([]);
-  const [aboutUsFaqs, setAboutUsFaqs] = useState<FAQ[]>([]);
+  const [faqs, setFaqs] = useState<Faq[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingFaq, setEditingFaq] = useState<{ faq: FAQ, type: 'general' | 'about' } | null>(null);
-  const [modalType, setModalType] = useState<'general' | 'about'>('general');
+  const [editingFaq, setEditingFaq] = useState<Faq | null>(null);
   const [formData, setFormData] = useState({
     question: '',
     answer: '',
+    category: 'sale' as Category,
+    order: 0,
   });
 
-  useEffect(() => {
-    const savedGeneral = localStorage.getItem('pronimal_faqs');
-    if (savedGeneral) {
-      setGeneralFaqs(JSON.parse(savedGeneral));
-    } else {
-      const initialGeneral = [
-        { id: '1', question: "What is Pronim.al?", answer: "Pronim.al is a comprehensive admin dashboard for agencies and agents." },
-        { id: '2', question: "How do I add a new agent?", answer: "Navigate to 'Agents' and click 'Add Agent'." }
-      ];
-      setGeneralFaqs(initialGeneral);
-      localStorage.setItem('pronimal_faqs', JSON.stringify(initialGeneral));
-    }
-
-    const savedAbout = localStorage.getItem('pronimal_about_faq_list');
-    if (savedAbout) {
-      setAboutUsFaqs(JSON.parse(savedAbout));
-    } else {
-      const initialAbout = [
-        { id: 'a1', question: "How was Pronim.al started?", answer: "Started by a team of real estate professionals and tech innovators who saw a gap in the market for high-quality administration tools." }
-      ];
-      setAboutUsFaqs(initialAbout);
-      localStorage.setItem('pronimal_about_faq_list', JSON.stringify(initialAbout));
-    }
-  }, []);
-
-  const saveFaqs = (type: 'general' | 'about', updated: FAQ[]) => {
-    if (type === 'general') {
-      setGeneralFaqs(updated);
-      localStorage.setItem('pronimal_faqs', JSON.stringify(updated));
-    } else {
-      setAboutUsFaqs(updated);
-      localStorage.setItem('pronimal_about_faq_list', JSON.stringify(updated));
+  const loadFaqs = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await fetchFaqs({ page: 1, limit: 200 });
+      setFaqs(data.faqs);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load FAQs');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const openModal = (type: 'general' | 'about', faq?: FAQ) => {
-    setModalType(type);
+  useEffect(() => {
+    loadFaqs();
+  }, []);
+
+  const openModal = (category: Category, faq?: Faq) => {
     if (faq) {
-      setEditingFaq({ faq, type });
-      setFormData({ question: faq.question, answer: faq.answer });
+      setEditingFaq(faq);
+      setFormData({
+        question: faq.question,
+        answer: faq.answer,
+        category: faq.category as Category,
+        order: faq.order,
+      });
     } else {
       setEditingFaq(null);
-      setFormData({ question: '', answer: '' });
+      setFormData({
+        question: '',
+        answer: '',
+        category,
+        order: 0,
+      });
     }
     setIsModalOpen(true);
   };
@@ -77,131 +73,113 @@ export default function FAQsPage() {
   const closeModal = () => {
     setIsModalOpen(false);
     setEditingFaq(null);
-    setFormData({ question: '', answer: '' });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const currentList = modalType === 'general' ? generalFaqs : aboutUsFaqs;
-    let updated;
-
-    if (editingFaq) {
-      updated = currentList.map(f => f.id === editingFaq.faq.id ? { ...f, ...formData } : f);
-    } else {
-      const newFaq = {
-        id: Math.random().toString(36).substr(2, 9),
-        ...formData,
-      };
-      updated = [...currentList, newFaq];
+    try {
+      if (editingFaq) {
+        await updateFaq(editingFaq.id, formData);
+      } else {
+        await createFaq(formData);
+      }
+      closeModal();
+      loadFaqs();
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Failed to save FAQ');
     }
-    
-    saveFaqs(modalType, updated);
-    closeModal();
   };
 
-  const handleDelete = (type: 'general' | 'about', id: string, e: React.MouseEvent) => {
+  const handleDelete = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    if (confirm('Are you sure you want to delete this FAQ?')) {
-      const currentList = type === 'general' ? generalFaqs : aboutUsFaqs;
-      saveFaqs(type, currentList.filter(f => f.id !== id));
+    if (!confirm('Are you sure you want to delete this FAQ?')) return;
+    try {
+      await deleteFaq(id);
+      loadFaqs();
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Failed to delete FAQ');
     }
   };
+
+  const faqsByCategory = CATEGORIES.reduce((acc, cat) => {
+    acc[cat.value] = faqs.filter((f) => f.category === cat.value);
+    return acc;
+  }, {} as Record<Category, Faq[]>);
 
   return (
     <div className="space-y-8">
       <div>
         <h1 className="text-2xl font-bold text-primary">Frequently Asked Questions</h1>
-        <p className="text-gray-500">Manage all your dashboard and company related questions</p>
+        <p className="text-gray-500">Manage FAQs for the frontend (sale, rent) and other sections</p>
       </div>
 
-      <div className="space-y-4">
-        <div className="flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <HelpCircle size={20} className="text-accent" />
-            <h2 className="text-xl font-bold text-primary">General FAQs</h2>
+      {loading ? (
+        <div className="text-center py-12 text-gray-500">Loading…</div>
+      ) : error ? (
+        <div className="text-center py-12 text-red-500">{error}</div>
+      ) : (
+        CATEGORIES.map((cat) => (
+          <div key={cat.value} className="space-y-4">
+            <div className="flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                <HelpCircle size={20} className="text-accent" />
+                <h2 className="text-xl font-bold text-primary">{cat.label}</h2>
+              </div>
+              <button
+                onClick={() => openModal(cat.value)}
+                className="pronimal-btn-accent flex items-center gap-2"
+              >
+                <Plus size={18} />
+                <span>Add FAQ</span>
+              </button>
+            </div>
+            <div className="pronimal-card p-6">
+              {faqsByCategory[cat.value]?.length > 0 ? (
+                <Accordion type="single" collapsible className="w-full">
+                  {faqsByCategory[cat.value].map((faq) => (
+                    <AccordionItem key={faq.id} value={faq.id} className="border-b last:border-0">
+                      <div className="flex items-center justify-between group">
+                        <AccordionTrigger className="text-left font-semibold text-primary flex-1 hover:no-underline">
+                          {faq.question}
+                        </AccordionTrigger>
+                        <div className="flex items-center gap-2 px-4">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openModal(faq.category as Category, faq);
+                            }}
+                            className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-md"
+                          >
+                            <Pencil size={16} />
+                          </button>
+                          <button
+                            onClick={(e) => handleDelete(faq.id, e)}
+                            className="p-1.5 text-red-600 hover:bg-red-50 rounded-md"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      </div>
+                      <AccordionContent className="text-gray-600">{faq.answer}</AccordionContent>
+                    </AccordionItem>
+                  ))}
+                </Accordion>
+              ) : (
+                <div className="text-center py-8 text-gray-400">
+                  No FAQs in this category. Click &quot;Add FAQ&quot; to create one.
+                </div>
+              )}
+            </div>
           </div>
-          <button onClick={() => openModal('general')} className="pronimal-btn-accent flex items-center gap-2">
-            <Plus size={18} />
-            <span>Add General FAQ</span>
-          </button>
-        </div>
-        <div className="pronimal-card p-6">
-          {generalFaqs.length > 0 ? (
-            <Accordion type="single" collapsible className="w-full">
-              {generalFaqs.map((faq) => (
-                <AccordionItem key={faq.id} value={faq.id} className="border-b last:border-0">
-                  <div className="flex items-center justify-between group">
-                    <AccordionTrigger className="text-left font-semibold text-primary flex-1 hover:no-underline">
-                      {faq.question}
-                    </AccordionTrigger>
-                    <div className="flex items-center gap-2 px-4">
-                      <button onClick={(e) => { e.stopPropagation(); openModal('general', faq); }} className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-md">
-                        <Pencil size={16} />
-                      </button>
-                      <button onClick={(e) => handleDelete('general', faq.id, e)} className="p-1.5 text-red-600 hover:bg-red-50 rounded-md">
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  </div>
-                  <AccordionContent className="text-gray-600">
-                    {faq.answer}
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
-          ) : (
-            <div className="text-center py-8 text-gray-400">No General FAQs found.</div>
-          )}
-        </div>
-      </div>
-
-      <div className="space-y-4">
-        <div className="flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <Info size={20} className="text-accent" />
-            <h2 className="text-xl font-bold text-primary">About Us FAQs</h2>
-          </div>
-          <button onClick={() => openModal('about')} className="pronimal-btn-accent flex items-center gap-2">
-            <Plus size={18} />
-            <span>Add About FAQ</span>
-          </button>
-        </div>
-        <div className="pronimal-card p-6">
-          {aboutUsFaqs.length > 0 ? (
-            <Accordion type="single" collapsible className="w-full">
-              {aboutUsFaqs.map((faq) => (
-                <AccordionItem key={faq.id} value={faq.id} className="border-b last:border-0">
-                  <div className="flex items-center justify-between group">
-                    <AccordionTrigger className="text-left font-semibold text-primary flex-1 hover:no-underline">
-                      {faq.question}
-                    </AccordionTrigger>
-                    <div className="flex items-center gap-2 px-4">
-                      <button onClick={(e) => { e.stopPropagation(); openModal('about', faq); }} className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-md">
-                        <Pencil size={16} />
-                      </button>
-                      <button onClick={(e) => handleDelete('about', faq.id, e)} className="p-1.5 text-red-600 hover:bg-red-50 rounded-md">
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  </div>
-                  <AccordionContent className="text-gray-600">
-                    {faq.answer}
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
-          ) : (
-            <div className="text-center py-8 text-gray-400">No About Us FAQs found.</div>
-          )}
-        </div>
-      </div>
+        ))
+      )}
 
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg max-w-lg w-full shadow-xl animate-in zoom-in-95">
             <div className="p-6 border-b border-gray-100 flex justify-between items-center">
               <h2 className="text-xl font-bold text-primary">
-                {editingFaq ? 'Edit FAQ' : `Add ${modalType === 'general' ? 'General' : 'About Us'} FAQ`}
+                {editingFaq ? 'Edit FAQ' : 'Add FAQ'}
               </h2>
               <button onClick={closeModal} className="text-gray-400 hover:text-gray-600">
                 <X size={24} />
@@ -209,12 +187,29 @@ export default function FAQsPage() {
             </div>
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <div>
+                <label className="pronimal-label">Category</label>
+                <select
+                  className="pronimal-input"
+                  value={formData.category}
+                  onChange={(e) =>
+                    setFormData({ ...formData, category: e.target.value as Category })
+                  }
+                  required
+                >
+                  {CATEGORIES.map((c) => (
+                    <option key={c.value} value={c.value}>
+                      {c.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
                 <label className="pronimal-label">Question</label>
                 <input
                   type="text"
                   className="pronimal-input"
                   value={formData.question}
-                  onChange={(e) => setFormData({...formData, question: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, question: e.target.value })}
                   required
                 />
               </div>
@@ -223,12 +218,30 @@ export default function FAQsPage() {
                 <textarea
                   className="pronimal-input min-h-[150px]"
                   value={formData.answer}
-                  onChange={(e) => setFormData({...formData, answer: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, answer: e.target.value })}
                   required
                 />
               </div>
+              <div>
+                <label className="pronimal-label">Order (optional)</label>
+                <input
+                  type="number"
+                  className="pronimal-input"
+                  min={0}
+                  value={formData.order}
+                  onChange={(e) =>
+                    setFormData({ ...formData, order: parseInt(e.target.value) || 0 })
+                  }
+                />
+              </div>
               <div className="pt-4 flex gap-3 justify-end">
-                <button type="button" onClick={closeModal} className="px-4 py-2 text-gray-600 font-medium">Cancel</button>
+                <button
+                  type="button"
+                  onClick={closeModal}
+                  className="px-4 py-2 text-gray-600 font-medium"
+                >
+                  Cancel
+                </button>
                 <button type="submit" className="pronimal-btn-primary">
                   {editingFaq ? 'Update' : 'Create'}
                 </button>

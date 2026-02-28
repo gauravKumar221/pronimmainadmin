@@ -7,17 +7,13 @@ import { usePathname, useRouter } from 'next/navigation';
 import { 
   LayoutDashboard, 
   FileText, 
-  Image as ImageIcon, 
-  User, 
-  Building2, 
-  Contact,
-  Info,
   HelpCircle,
   ShieldCheck,
   FileCheck,
   LogOut,
   Mail,
-  MessageSquare
+  MessageSquare,
+  ClipboardList
 } from 'lucide-react';
 import {
   Sidebar,
@@ -35,13 +31,9 @@ import {
 const navItems = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { name: 'Blog Management', href: '/dashboard/blog', icon: FileText },
-  { name: 'Banner Management', href: '/dashboard/banner', icon: ImageIcon },
-  { name: 'Agents', href: '/dashboard/agent', icon: User },
-  { name: 'Agencies', href: '/dashboard/agency', icon: Building2 },
-  { name: 'Owners', href: '/dashboard/owner', icon: Contact },
   { name: 'Newsletter', href: '/dashboard/newsletter', icon: Mail },
   { name: 'Contact Us', href: '/dashboard/contact', icon: MessageSquare },
-  { name: 'About Us', href: '/dashboard/about', icon: Info },
+  { name: 'Enquiry Form', href: '/dashboard/enquiry', icon: ClipboardList },
   { name: 'FAQs', href: '/dashboard/faqs', icon: HelpCircle },
   { name: 'Privacy Policy', href: '/dashboard/privacy', icon: ShieldCheck },
   { name: 'Terms & Conditions', href: '/dashboard/terms', icon: FileCheck },
@@ -53,6 +45,7 @@ export default function AppSidebar() {
   const { state } = useSidebar();
 
   const handleLogout = () => {
+    document.cookie = 'super_admin_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT';
     document.cookie = 'admin_auth=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT';
     localStorage.removeItem('pronimal_last_login');
     router.push('/login');

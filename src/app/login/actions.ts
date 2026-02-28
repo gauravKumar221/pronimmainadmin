@@ -1,43 +1,58 @@
-
 'use server';
 
 import { cookies } from 'next/headers';
 
+const getApiUrl = () =>
+  process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
+
+const COOKIE_NAME = 'super_admin_token';
+
 /**
- * Server action to handle admin login verification.
- * Compares input against environment variables and sets an auth cookie on success.
+ * Server action: Super Admin login via backend API
+ * Calls pronim-backend /api/super-admin/login and sets JWT cookie on success
  */
 export async function loginAction(identifier: string, password: string) {
-  const ADMIN_USERNAME = process.env.ADMIN_USERNAME;
-  const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
-  const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+  const cleanIdentifier = identifier?.trim() || '';
+  const cleanPassword = password?.trim() || '';
 
-  // Debug check (only visible in server logs)
-  if (!ADMIN_PASSWORD) {
-    console.error('Login Error: ADMIN_PASSWORD is not set in environment variables.');
-    return { success: false, error: 'System configuration error. Please contact support.' };
+  if (!cleanIdentifier || !cleanPassword) {
+    return { success: false, error: 'Username/email and password are required' };
   }
 
-  // Basic validation against environment variables
-  // Trimming inputs to avoid issues with accidental trailing spaces
-  const cleanIdentifier = identifier.trim();
-  const cleanPassword = password.trim();
-
-  if (
-    (cleanIdentifier === ADMIN_USERNAME || cleanIdentifier === ADMIN_EMAIL) &&
-    cleanPassword === ADMIN_PASSWORD
-  ) {
-    const cookieStore = await cookies();
-    // Set a cookie that matches the middleware's expectation
-    cookieStore.set('admin_auth', 'true', {
-      path: '/',
-      maxAge: 3600, // 1 hour
-      httpOnly: false,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+  try {
+    const res = await fetch(`${getApiUrl()}/super-admin/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ identifier: cleanIdentifier, password: cleanPassword }),
     });
-    return { success: true };
-  }
 
-  return { success: false, error: 'Invalid username/email or password' };
+    const data = await res.json();
+
+    if (!res.ok) {
+      return {
+        success: false,
+        error: data.message || 'Invalid username/email or password',
+      };
+    }
+
+    if (data.success && data.data?.token) {
+      const cookieStore = await cookies();
+      cookieStore.set(COOKIE_NAME, data.data.token, {
+        path: '/',
+        maxAge: 3600, // 1 hour
+        httpOnly: false, // Client may need to read for API calls
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+      });
+      return { success: true };
+    }
+
+    return { success: false, error: 'Invalid response from server' };
+  } catch (err) {
+    console.error('Super Admin login error:', err);
+    return {
+      success: false,
+      error: 'Unable to reach server. Please try again.',
+    };
+  }
 }

@@ -20,6 +20,7 @@ export default function BlogManagement() {
   const [editingPost, setEditingPost] = useState<BlogPost | null>(null);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [content, setContent] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
@@ -46,8 +47,13 @@ export default function BlogManagement() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!stripHtml(description).trim()) {
-      setError('Description is required');
+    if (!title.trim()) {
+      setError('Title is required');
+      return;
+    }
+    const hasContent = stripHtml(content || description).trim();
+    if (!hasContent) {
+      setError('Description or full content is required');
       return;
     }
     setIsLoading(true);
@@ -56,13 +62,15 @@ export default function BlogManagement() {
       if (editingPost) {
         await updateBlog(editingPost.id, {
           title,
-          description,
+          description: description || stripHtml(content).slice(0, 200),
+          content: content || undefined,
           imageUrl: imageUrl || undefined,
         });
       } else {
         await createBlog({
           title,
-          description,
+          description: description || stripHtml(content).slice(0, 200),
+          content: content || undefined,
           imageUrl: imageUrl || undefined,
         });
       }
@@ -113,12 +121,14 @@ export default function BlogManagement() {
     if (post) {
       setEditingPost(post);
       setTitle(post.title);
-      setDescription(post.description);
+      setDescription(post.description || '');
+      setContent(post.content || '');
       setImageUrl(post.imageUrl || '');
     } else {
       setEditingPost(null);
       setTitle('');
       setDescription('');
+      setContent('');
       setImageUrl('');
     }
     setError('');
@@ -130,6 +140,7 @@ export default function BlogManagement() {
     setEditingPost(null);
     setTitle('');
     setDescription('');
+    setContent('');
     setImageUrl('');
     setError('');
   };
@@ -228,9 +239,9 @@ export default function BlogManagement() {
       </div>
 
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-lg w-full shadow-xl animate-in zoom-in-95">
-            <div className="p-6 border-b border-gray-100 flex justify-between items-center">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto !mt-0">
+          <div className="bg-white rounded-lg max-w-2xl w-full shadow-xl animate-in zoom-in-95 my-8 flex flex-col max-h-[calc(100vh-4rem)] overflow-hidden">
+            <div className="p-6 border-b border-gray-100 flex justify-between items-center shrink-0">
               <h2 className="text-xl font-bold text-primary">
                 {editingPost ? 'Edit Blog Post' : 'Create New Post'}
               </h2>
@@ -238,7 +249,8 @@ export default function BlogManagement() {
                 <X size={24} />
               </button>
             </div>
-            <form onSubmit={handleSubmit} className="p-6 space-y-4">
+            <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
+              <div className="p-6 space-y-4 overflow-y-auto flex-1 min-h-0">
               <div>
                 <label className="pronimal-label">Title</label>
                 <input
@@ -295,16 +307,30 @@ export default function BlogManagement() {
               </div>
 
               <div>
-                <label className="pronimal-label">Description</label>
-                <RichTextEditor
-                  key={editingPost?.id ?? 'new'}
+                <label className="pronimal-label">Short description (for cards / excerpt)</label>
+                <textarea
+                  className="pronimal-input min-h-[80px] max-h-[140px] overflow-y-auto resize-y"
                   value={description}
-                  onChange={setDescription}
-                  placeholder="Write your post description or content..."
-                  minHeight="160px"
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Brief summary for list and cards..."
+                  maxLength={300}
+                />
+                <p className="text-xs text-gray-500 mt-1">{Math.min(description.length, 300)}/300 characters</p>
+              </div>
+
+              <div>
+                <label className="pronimal-label">Full content (main article)</label>
+                <p className="text-xs text-gray-500 mb-2">Main body shown on the blog post page. Use H1, H2, lists, bold, etc.</p>
+                <RichTextEditor
+                  key={`content-${editingPost?.id ?? 'new'}`}
+                  value={content}
+                  onChange={setContent}
+                  placeholder="Write your full article content..."
+                  minHeight="200px"
                 />
               </div>
-              <div className="pt-4 flex gap-3 justify-end">
+              </div>
+              <div className="p-6 pt-4 flex gap-3 justify-end border-t border-gray-100 shrink-0">
                 <button type="button" onClick={closeModal} className="px-4 py-2 text-gray-600 font-medium">
                   Cancel
                 </button>

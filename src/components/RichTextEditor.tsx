@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useEffect, useCallback } from 'react';
-import { Bold, Italic, List, ListOrdered, Quote, Undo, Redo } from 'lucide-react';
+import { Bold, Italic, Underline, List, ListOrdered, Quote, Undo, Redo } from 'lucide-react';
 
 interface RichTextEditorProps {
   value: string;
@@ -84,6 +84,12 @@ export function RichTextEditor({
           <Italic size={16} />
         </ToolbarButton>
         <ToolbarButton
+          onClick={() => execCommand('underline')}
+          title="Underline"
+        >
+          <Underline size={16} />
+        </ToolbarButton>
+        <ToolbarButton
           onClick={() => execCommand('insertUnorderedList')}
           title="Bullet list"
         >
@@ -115,8 +121,20 @@ export function RichTextEditor({
           <Redo size={16} />
         </ToolbarButton>
         <ToolbarButton
-          onClick={() => execCommand('formatBlock', 'h3')}
-          title="Heading"
+          onClick={() => execCommand('formatBlock', '<h1>')}
+          title="Heading 1"
+        >
+          <span className="text-xs font-bold">H1</span>
+        </ToolbarButton>
+        <ToolbarButton
+          onClick={() => execCommand('formatBlock', '<h2>')}
+          title="Heading 2"
+        >
+          <span className="text-xs font-bold">H2</span>
+        </ToolbarButton>
+        <ToolbarButton
+          onClick={() => execCommand('formatBlock', '<h3>')}
+          title="Heading 3"
         >
           <span className="text-xs font-bold">H3</span>
         </ToolbarButton>

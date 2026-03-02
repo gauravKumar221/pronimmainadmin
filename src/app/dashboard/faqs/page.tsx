@@ -14,7 +14,8 @@ const CATEGORIES = [
   { value: 'sale', label: 'Questions about the sale' },
   { value: 'rent', label: 'Question about renting' },
   { value: 'general', label: 'General' },
-  { value: 'about', label: 'About Us' },
+  // About Us category commented out:
+  // { value: 'about', label: 'About Us' },
 ] as const;
 
 type Category = (typeof CATEGORIES)[number]['value'];
